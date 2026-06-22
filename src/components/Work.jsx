@@ -23,20 +23,38 @@ export default function Work({ works = [] }) {
           
           return (
             <article key={work.id} className={`bg-background border-4 border-on-background neo-shadow neo-shadow-blue hover:-translate-y-2 transition-all duration-300 ${rotationClass} hover:rotate-0 flex flex-col h-full group relative z-10 hover:z-20 ${index % 2 !== 0 ? 'md:mt-12' : ''}`}>
-              <div className={`aspect-video border-b-4 border-on-background overflow-hidden relative ${imgBgClass} p-6`}>
-                {work.mediaType === 'video' ? (
-                  <video 
-                    className="w-full h-full object-cover border-2 border-on-background transition-all duration-500" 
-                    src={work.imageUrl} 
-                    autoPlay muted loop playsInline 
-                  />
-                ) : (
-                  <img 
-                    className="w-full h-full object-cover border-2 border-on-background transition-all duration-500" 
-                    alt={work.title} 
-                    src={work.imageUrl} 
-                  />
-                )}
+              <div className={`aspect-square border-b-4 border-on-background overflow-hidden relative ${imgBgClass} p-6`}>
+                {(() => {
+                  const urlParts = work.imageUrl.split('#pos=');
+                  const src = urlParts[0];
+                  const [posX, posY, scale] = urlParts[1] ? urlParts[1].split(',') : ['50', '50', '100'];
+                  const objectPosition = `${posX}% ${posY}%`;
+                  const S = parseInt(scale) / 100;
+                  const maxShift = ((S - 1) / 2) * 100;
+                  const shiftX = ((50 - parseInt(posX)) / 50) * maxShift;
+                  const shiftY = ((50 - parseInt(posY)) / 50) * maxShift;
+                  const transform = `scale(${S}) translate(${shiftX}%, ${shiftY}%)`;
+                  
+                  return (
+                    <div className="w-full h-full border-2 border-on-background overflow-hidden relative bg-surface-variant flex items-center justify-center">
+                      {work.mediaType === 'video' ? (
+                        <video 
+                          className="w-full h-full object-contain transition-all duration-500" 
+                          src={src} 
+                          style={{ transform }}
+                          autoPlay muted loop playsInline 
+                        />
+                      ) : (
+                        <img 
+                          className="w-full h-full object-contain transition-all duration-500" 
+                          alt={work.title} 
+                          src={src} 
+                          style={{ transform }}
+                        />
+                      )}
+                    </div>
+                  );
+                })()}
                 {work.liveUrl && (
                   <div className="absolute top-8 right-8 bg-primary-container border-2 border-on-background px-3 py-1 font-label-mono text-label-mono rotate-6 uppercase">
                     LIVE

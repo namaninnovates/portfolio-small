@@ -14,7 +14,7 @@ cloudinary.config({
 export async function getCloudinarySignature() {
   const timestamp = Math.round(new Date().getTime() / 1000)
   const signature = cloudinary.utils.api_sign_request(
-    { timestamp, folder: 'portfolio' },
+    { timestamp, folder: 'portfolio', source: 'uw' },
     process.env.CLOUDINARY_API_SECRET
   )
   

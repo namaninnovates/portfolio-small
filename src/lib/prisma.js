@@ -7,6 +7,6 @@ const prismaClientSingleton = () => {
 // Ensure the same PrismaClient instance is used in development
 const globalForPrisma = globalThis
 
-export const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
+export const prisma = globalForPrisma.prisma_fresh_instance_v2 ?? prismaClientSingleton()
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma_fresh_instance_v2 = prisma

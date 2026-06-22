@@ -104,6 +104,11 @@ function Pipe() {
 
 // Coin that arcs upward
 function Coin({ x, onDone }) {
+  useEffect(() => {
+    const timer = setTimeout(onDone, 550);
+    return () => clearTimeout(timer);
+  }, [onDone]);
+
   return (
     <div
       className="absolute pointer-events-none z-40"
@@ -123,7 +128,7 @@ function Coin({ x, onDone }) {
 // Pipe positions (relative to navbar width)
 const PIPES = [
   { relX: 0.30 }, // left pipe — more towards center
-  { relX: 0.88 }, // right pipe — before hire me
+  { relX: 0.75 }, // right pipe — pushed left to avoid Hire Me overlap
 ];
 
 export default function Navbar() {
@@ -268,6 +273,15 @@ export default function Navbar() {
   }, []);
 
   const NAV_LINKS = ['Work', 'About', 'Contact'];
+  return (
+    <>
+      <style>{`
+        @keyframes coinArc {
+          0%   { transform: translateY(0px)   scale(1);   opacity: 1; }
+          45%  { transform: translateY(-36px) scale(1.3); opacity: 1; }
+          100% { transform: translateY(-54px) scale(0.5); opacity: 0; }
+        }
+      `}</style>
 
       {/* Mobile Menu Popup */}
       {isMobileMenuOpen && (
@@ -322,10 +336,10 @@ export default function Navbar() {
 
           {/* ── Logo ────────────────────────────────────── */}
           <a
-            className="font-display-xl-mobile text-2xl md:text-display-xl-mobile text-secondary-container -rotate-3 hover:rotate-0 transition-transform z-30 relative pb-1"
+            className="font-display-xl-mobile text-2xl md:text-display-xl-mobile text-on-background -rotate-3 hover:rotate-0 transition-transform z-30 relative pb-1"
             href="#"
           >
-            IAMNAMANG
+            IAM<span className="text-secondary-container">NAMAN</span>G
           </a>
 
           {/* ── Nav links (hit blocks) ──────────────────── */}
