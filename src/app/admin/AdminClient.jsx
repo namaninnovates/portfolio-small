@@ -140,8 +140,8 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
           if (videoTrim.start > 0) transforms.push(`so_${videoTrim.start}`);
           if (videoTrim.end > 0 && videoTrim.end < uploadedMedia.duration) transforms.push(`eo_${videoTrim.end}`);
           
-          // Always apply high quality and native frame rate to videos
-          transforms.push('q_auto:best', 'fps_keep');
+          // Always apply high quality and native frame rate up to 60fps
+          transforms.push('q_auto:best', 'fps_60-');
           
           if (secureUrl.includes('/upload/')) {
             secureUrl = secureUrl.replace('/upload/', `/upload/${transforms.join(',')}/`);
