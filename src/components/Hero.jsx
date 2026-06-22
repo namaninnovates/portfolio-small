@@ -180,13 +180,13 @@ export default function Hero() {
             className="relative z-20 max-w-5xl mx-auto text-center md:text-left transition-transform duration-200 ease-out"
             style={{ transform: `translate(${mousePos.x * -30}px, ${mousePos.y * -30}px)` }}
           >
-            <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-tight md:leading-none mb-6 md:mb-8 tracking-tighter">
+            <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-[1.1] md:leading-none mb-4 md:mb-8 tracking-tighter">
               <span className="block md:-ml-2 hover:ml-2 transition-all duration-300"><span className="text-cobalt">CREATIVE</span> <span className="text-primary-container drop-shadow-[4px_4px_0_#1b1c15] md:drop-shadow-[8px_8px_0_#1b1c15] stroke-on-background" style={{ WebkitTextStroke: '2px #1b1c15' }}>BY DESIGN,</span></span>
-              <span className="block md:ml-4 hover:-ml-2 transition-all duration-300">EDITOR <span className="bg-on-background text-background px-2 md:px-4 inline-block -rotate-2 mt-2 md:mt-0">BY CRAFT,</span></span>
-              <span className="block text-secondary-container hover:text-on-background transition-colors duration-300 mt-2 md:mt-0">DEV BY CHOICE</span>
+              <span className="block md:ml-4 hover:-ml-2 transition-all duration-300">EDITOR <span className="bg-on-background text-background px-2 md:px-4 inline-block -rotate-2">BY CRAFT,</span></span>
+              <span className="block text-secondary-container hover:text-on-background transition-colors duration-300">DEV BY CHOICE</span>
             </h1>
-            <p className="font-body-lg text-body-lg max-w-2xl bg-background border-l-8 border-primary-container pl-6 py-2 mb-12 relative mx-auto md:mx-0">
-              <span className="absolute -left-6 -top-6 text-6xl text-on-background opacity-20 font-display-xl">&quot;</span>
+            <p className="font-body-sm md:font-body-lg text-sm md:text-body-lg max-w-2xl bg-background border-l-8 border-primary-container pl-4 md:pl-6 py-1 md:py-2 mb-6 md:mb-12 relative mx-auto md:mx-0">
+              <span className="absolute -left-6 -top-6 text-5xl md:text-6xl text-on-background opacity-20 font-display-xl">&quot;</span>
               I build websites that break the grid and edit videos that move the needle. Punchy, fast, and unapologetically loud.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-8 md:gap-12 relative">
