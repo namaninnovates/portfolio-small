@@ -43,7 +43,7 @@ export default function Work({ works = [] }) {
           const rotationClass = rotations[index % rotations.length]
           
           return (
-            <article key={work.id} className={`bg-background border-4 border-on-background neo-shadow neo-shadow-blue hover:-translate-y-2 transition-all duration-300 ${rotationClass} hover:rotate-0 flex flex-col h-full group relative z-10 hover:z-20 ${index % 2 !== 0 ? 'md:mt-8' : ''}`}>
+            <article key={work.id} className={`bg-background border-4 border-on-background neo-shadow neo-shadow-blue hover:-translate-y-2 transition-all duration-300 ${rotationClass} hover:rotate-0 flex flex-col group relative z-10 hover:z-20 ${index % 2 !== 0 ? 'md:mt-8' : ''}`}>
               <div className={`aspect-square border-b-4 border-on-background overflow-hidden relative bg-surface-variant p-4`}>
                 {(() => {
                   const urlParts = work.imageUrl.split('#pos=');
@@ -82,10 +82,10 @@ export default function Work({ works = [] }) {
                   </div>
                 )}
               </div>
-              <div className="p-5 flex flex-col flex-grow bg-dots bg-opacity-10">
-                <h3 className="font-headline-md text-xl uppercase mb-1.5 group-hover:text-cobalt transition-colors line-clamp-1">{work.title}</h3>
-                <p className="font-body-md text-sm mb-4 line-clamp-2">{work.description}</p>
-                <div className="mt-auto flex justify-between items-center border-t-4 border-on-background pt-4 border-dashed">
+              <div className="p-3 flex flex-col bg-dots bg-opacity-10">
+                <h3 className="font-headline-md text-lg uppercase mb-1 group-hover:text-cobalt transition-colors line-clamp-1">{work.title}</h3>
+                <p className="font-body-md text-xs mb-2 line-clamp-2">{work.description}</p>
+                <div className="mt-auto flex justify-between items-center border-t-2 border-on-background pt-2 border-dashed">
                   <div className="flex gap-1.5 flex-wrap max-w-[75%]">
                     {work.tools.split(',').slice(0, 3).map((tool, i) => {
                       const color = getToolColor(tool);
