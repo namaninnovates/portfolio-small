@@ -80,25 +80,14 @@ export default function Hero() {
       setMousePos({ x, y });
     };
 
-    const handleOrientation = (e) => {
-      if (e.gamma === null || e.beta === null) return;
-      // gamma is left/right (-90 to 90)
-      // beta is front/back (-180 to 180, typically 0-90 when holding)
-      let x = Math.max(-1, Math.min(1, e.gamma / 45));
-      let y = Math.max(-1, Math.min(1, (e.beta - 45) / 45));
-      setMousePos({ x, y });
-    };
-
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("pointermove", handlePointerMove);
-    window.addEventListener("deviceorientation", handleOrientation);
     handleScroll(); // initialize
     
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("pointermove", handlePointerMove);
-      window.removeEventListener("deviceorientation", handleOrientation);
     };
   }, []);
 
@@ -169,10 +158,10 @@ export default function Hero() {
           
           {/* Experience Ribbon */}
           <div 
-            className="absolute top-10 left-2 md:left-4 bg-secondary-container text-on-secondary border-4 border-on-background py-2 px-8 -rotate-6 neo-shadow z-10 w-auto transition-transform duration-200 ease-out"
+            className="absolute top-2 md:top-10 left-2 md:left-4 bg-secondary-container text-on-secondary border-4 border-on-background py-1 px-4 md:py-2 md:px-8 -rotate-6 neo-shadow z-10 w-auto transition-transform duration-200 ease-out"
             style={{ transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px) rotate(-6deg)` }}
           >
-            <span className="font-label-mono text-label-mono uppercase whitespace-nowrap">6+ YEARS OF EDITING &amp; BUILDING</span>
+            <span className="font-label-mono text-[10px] md:text-label-mono uppercase whitespace-nowrap">6+ YEARS OF EDITING &amp; BUILDING</span>
           </div>
           
           {/* Floating Sticker */}
@@ -191,10 +180,10 @@ export default function Hero() {
             className="relative z-20 max-w-5xl mx-auto text-center md:text-left transition-transform duration-200 ease-out"
             style={{ transform: `translate(${mousePos.x * -30}px, ${mousePos.y * -30}px)` }}
           >
-            <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-none mb-8 tracking-tighter">
+            <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-tight md:leading-none mb-6 md:mb-8 tracking-tighter">
               <span className="block md:-ml-2 hover:ml-2 transition-all duration-300"><span className="text-cobalt">CREATIVE</span> <span className="text-primary-container drop-shadow-[4px_4px_0_#1b1c15] md:drop-shadow-[8px_8px_0_#1b1c15] stroke-on-background" style={{ WebkitTextStroke: '2px #1b1c15' }}>BY DESIGN,</span></span>
-              <span className="block md:ml-4 hover:-ml-2 transition-all duration-300">EDITOR <span className="bg-on-background text-background px-4 inline-block -rotate-2">BY CRAFT,</span></span>
-              <span className="block text-secondary-container hover:text-on-background transition-colors duration-300">DEV BY CHOICE</span>
+              <span className="block md:ml-4 hover:-ml-2 transition-all duration-300">EDITOR <span className="bg-on-background text-background px-2 md:px-4 inline-block -rotate-2 mt-2 md:mt-0">BY CRAFT,</span></span>
+              <span className="block text-secondary-container hover:text-on-background transition-colors duration-300 mt-2 md:mt-0">DEV BY CHOICE</span>
             </h1>
             <p className="font-body-lg text-body-lg max-w-2xl bg-background border-l-8 border-primary-container pl-6 py-2 mb-12 relative mx-auto md:mx-0">
               <span className="absolute -left-6 -top-6 text-6xl text-on-background opacity-20 font-display-xl">&quot;</span>
@@ -216,7 +205,7 @@ export default function Hero() {
 
           {/* Tool Chips Scattered */}
           <div 
-            className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-200 ease-out opacity-40 md:opacity-100 scale-75 md:scale-100"
+            className="hidden md:block absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-200 ease-out opacity-40 md:opacity-100 scale-75 md:scale-100"
             style={{ transform: `translate(${mousePos.x * 50}px, ${mousePos.y * 50}px)` }}
           >
             <span className="absolute top-[10%] md:top-[20%] left-[5%] md:left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">data_object</span>JavaScript</span>
