@@ -12,6 +12,7 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
   const [activeTab, setActiveTab] = useState('works')
   const [editingWork, setEditingWork] = useState(null)
   const [isPending, setIsPending] = useState(false)
+  const [isWidgetLoading, setIsWidgetLoading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState({ active: false, percent: 0, loadedMB: 0, totalMB: 0 })
   const [uploadedMedia, setUploadedMedia] = useState(null)
   const [videoTrim, setVideoTrim] = useState({ start: 0, end: 0 })
@@ -46,7 +47,18 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
 
   const handleOpenWidget = async () => {
     try {
+      setIsWidgetLoading(true);
+      if (typeof window === 'undefined' || !window.cloudinary) {
+        alert("Cloudinary script is still loading. Please wait a few seconds and try again.");
+        setIsWidgetLoading(false);
+        return;
+      }
       const sigData = await getCloudinarySignature();
+      if (!sigData || !sigData.cloudName || !sigData.apiKey || !sigData.signature) {
+        alert("Cloudinary configuration is missing. Ensure CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, and CLOUDINARY_CLOUD_NAME are set in your Vercel deployment.");
+        setIsWidgetLoading(false);
+        return;
+      }
       const widget = window.cloudinary.createUploadWidget({
         cloudName: sigData.cloudName,
         apiKey: sigData.apiKey,
@@ -70,9 +82,11 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
         }
       });
       widget.open();
+      setIsWidgetLoading(false);
     } catch (err) {
       alert('Failed to initialize upload widget.');
       console.error(err);
+      setIsWidgetLoading(false);
     }
   }
 
@@ -342,10 +356,11 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
                   <button 
                     type="button" 
                     onClick={handleOpenWidget} 
-                    className="w-full bg-surface-variant text-on-background border-4 border-on-background p-2 font-label-mono text-label-mono uppercase hover:bg-cobalt hover:text-white transition-all text-left flex justify-between items-center"
+                    disabled={isWidgetLoading}
+                    className="w-full bg-surface-variant text-on-background border-4 border-on-background p-2 font-label-mono text-label-mono uppercase hover:bg-cobalt hover:text-white transition-all text-left flex justify-between items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <span>{uploadedMedia || (editingWork && editingWork.imageUrl) ? 'Change Media (Trim/Crop)' : 'Upload Media (Trim/Crop)'}</span>
-                    <span className="material-symbols-outlined">upload</span>
+                    <span>{isWidgetLoading ? 'Initializing Widget...' : (uploadedMedia || (editingWork && editingWork.imageUrl) ? 'Change Media (Trim/Crop)' : 'Upload Media (Trim/Crop)')}</span>
+                    <span className="material-symbols-outlined">{isWidgetLoading ? 'hourglass_empty' : 'upload'}</span>
                   </button>
 
                 </div>
