@@ -343,7 +343,7 @@ export default function Navbar() {
 
           {/* ── Logo ────────────────────────────────────── */}
           <a
-            className="font-display-xl-mobile text-display-xl-mobile text-secondary-container -rotate-3 hover:rotate-0 transition-transform z-30 relative pb-1"
+            className="font-display-xl-mobile text-2xl md:text-display-xl-mobile text-secondary-container -rotate-3 hover:rotate-0 transition-transform z-30 relative pb-1"
             href="#"
           >
             IAMNAMANG

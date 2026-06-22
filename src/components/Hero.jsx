@@ -73,14 +73,25 @@ export default function Hero() {
       setMousePos({ x, y });
     };
 
+    const handleOrientation = (e) => {
+      if (e.gamma === null || e.beta === null) return;
+      // gamma is left/right (-90 to 90)
+      // beta is front/back (-180 to 180, typically 0-90 when holding)
+      let x = Math.max(-1, Math.min(1, e.gamma / 45));
+      let y = Math.max(-1, Math.min(1, (e.beta - 45) / 45));
+      setMousePos({ x, y });
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("deviceorientation", handleOrientation);
     handleScroll(); // initialize
     
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("deviceorientation", handleOrientation);
     };
   }, []);
 

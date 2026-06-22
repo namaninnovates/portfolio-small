@@ -17,12 +17,25 @@ export default function InteractiveBackground() {
       setScrollY(window.scrollY);
     };
 
+    const handleOrientation = (e) => {
+      if (e.gamma === null || e.beta === null) return;
+      let normX = Math.max(-1, Math.min(1, e.gamma / 45));
+      let normY = Math.max(-1, Math.min(1, (e.beta - 45) / 45));
+      
+      setCursorPos({ 
+        x: window.innerWidth / 2 + normX * (window.innerWidth / 2), 
+        y: window.innerHeight / 2 + normY * (window.innerHeight / 2) 
+      });
+    };
+
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("deviceorientation", handleOrientation);
     
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("deviceorientation", handleOrientation);
     };
   }, []);
 
