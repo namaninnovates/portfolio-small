@@ -111,6 +111,8 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
     { label: 'Web Design', color: '#99ccff', text: '#000' },
     { label: 'Branding', color: '#ffcc99', text: '#000' },
     { label: 'Development', color: '#ccff99', text: '#000' },
+    { label: 'Video Editing', color: '#c4b5fd', text: '#000' },
+    { label: 'Gen AI', color: '#fcd34d', text: '#000' },
   ]
 
   const PRESET_TOOLS = [
@@ -119,6 +121,8 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
     { label: 'Tailwind', color: '#38bdf8', text: '#000' },
     { label: 'Figma', color: '#f24e1e', text: '#fff' },
     { label: 'After Effects', color: '#9999ff', text: '#000' },
+    { label: 'Premiere Pro', color: '#ea77ff', text: '#000' },
+    { label: 'Google Flow', color: '#ccff00', text: '#000' },
   ]
 
   const handleSubmit = async (e) => {
