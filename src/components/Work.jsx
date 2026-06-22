@@ -23,12 +23,20 @@ export default function Work({ works = [] }) {
           
           return (
             <article key={work.id} className={`bg-background border-4 border-on-background neo-shadow neo-shadow-blue hover:-translate-y-2 transition-all duration-300 ${rotationClass} hover:rotate-0 flex flex-col h-full group relative z-10 hover:z-20 ${index % 2 !== 0 ? 'md:mt-12' : ''}`}>
-              <div className={`h-64 border-b-4 border-on-background overflow-hidden relative ${imgBgClass} p-6`}>
-                <img 
-                  className="w-full h-full object-cover border-2 border-on-background grayscale group-hover:grayscale-0 transition-all duration-500" 
-                  alt={work.title} 
-                  src={work.imageUrl} 
-                />
+              <div className={`aspect-video border-b-4 border-on-background overflow-hidden relative ${imgBgClass} p-6`}>
+                {work.mediaType === 'video' ? (
+                  <video 
+                    className="w-full h-full object-cover border-2 border-on-background transition-all duration-500" 
+                    src={work.imageUrl} 
+                    autoPlay muted loop playsInline 
+                  />
+                ) : (
+                  <img 
+                    className="w-full h-full object-cover border-2 border-on-background transition-all duration-500" 
+                    alt={work.title} 
+                    src={work.imageUrl} 
+                  />
+                )}
                 {work.liveUrl && (
                   <div className="absolute top-8 right-8 bg-primary-container border-2 border-on-background px-3 py-1 font-label-mono text-label-mono rotate-6 uppercase">
                     LIVE

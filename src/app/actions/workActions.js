@@ -2,17 +2,41 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { v2 as cloudinary } from 'cloudinary'
+
+// Configure cloudinary with environment variables
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
+
+export async function getCloudinarySignature() {
+  const timestamp = Math.round(new Date().getTime() / 1000)
+  const signature = cloudinary.utils.api_sign_request(
+    { timestamp, folder: 'portfolio' },
+    process.env.CLOUDINARY_API_SECRET
+  )
+  
+  return {
+    timestamp,
+    signature,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  }
+}
 
 export async function createWork(formData) {
   try {
     const data = {
       title: formData.get('title'),
       description: formData.get('description'),
-      imageUrl: formData.get('imageUrl'),
       tags: formData.get('tags'),
       projectUrl: formData.get('projectUrl') || null,
       liveUrl: formData.get('liveUrl') || null,
       tools: formData.get('tools'),
+      imageUrl: formData.get('imageUrl') || '',
+      mediaType: formData.get('mediaType') || 'image',
     }
 
     await prisma.work.create({ data })
@@ -30,11 +54,19 @@ export async function updateWork(id, formData) {
     const data = {
       title: formData.get('title'),
       description: formData.get('description'),
-      imageUrl: formData.get('imageUrl'),
       tags: formData.get('tags'),
       projectUrl: formData.get('projectUrl') || null,
       liveUrl: formData.get('liveUrl') || null,
       tools: formData.get('tools'),
+    }
+
+    const imageUrl = formData.get('imageUrl')
+    if (imageUrl) {
+      data.imageUrl = imageUrl
+      data.mediaType = formData.get('mediaType') || 'image'
+    } else {
+      data.imageUrl = formData.get('existingImageUrl') || ''
+      data.mediaType = formData.get('existingMediaType') || 'image'
     }
 
     await prisma.work.update({

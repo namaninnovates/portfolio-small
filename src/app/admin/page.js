@@ -7,6 +7,10 @@ export default async function AdminPage() {
   const works = await prisma.work.findMany({
     orderBy: { createdAt: 'desc' }
   })
+  
+  const enquiries = await prisma.enquiry.findMany({
+    orderBy: { createdAt: 'desc' }
+  })
 
-  return <AdminClient initialWorks={works} />
+  return <AdminClient initialWorks={works} initialEnquiries={enquiries} />
 }

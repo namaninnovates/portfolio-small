@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import HireMeModal from "@/components/HireMeModal";
 
 // ═══════════════════════════════════════
 //  PALETTE
@@ -144,6 +145,7 @@ export default function Navbar() {
   const [coins, setCoins]       = useState([]);
   const [display, setDisplay]   = useState({ x: -50, y: 0, frame: 0, dir: 1 });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isHireMeOpen, setIsHireMeOpen] = useState(false);
 
   const spawnCoin = (absX) => {
     setCoins(prev => [...prev, { id: Date.now() + Math.random(), x: absX }]);
@@ -305,7 +307,7 @@ export default function Navbar() {
           ))}
           <button 
             className="mt-8 bg-secondary text-on-secondary border-4 border-on-background px-8 py-4 font-headline-md text-3xl uppercase neo-shadow transition-all duration-150 -rotate-2 relative z-10"
-            onClick={() => setIsMobileMenuOpen(false)}
+            onClick={() => { setIsMobileMenuOpen(false); setIsHireMeOpen(true); }}
           >
             Hire Me
           </button>
@@ -383,7 +385,10 @@ export default function Navbar() {
 
           <div className="flex items-center gap-4 z-30 relative mb-1">
             {/* ── Hire Me ─────────────────────────────────── */}
-            <button className="hidden md:block bg-primary-container text-on-background border-4 border-on-background px-6 py-2 font-label-mono text-label-mono uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2">
+            <button 
+              onClick={() => setIsHireMeOpen(true)}
+              className="hidden md:block bg-primary-container text-on-background border-4 border-on-background px-6 py-2 font-label-mono text-label-mono uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2"
+            >
               Hire Me
             </button>
 
@@ -397,6 +402,8 @@ export default function Navbar() {
           </div>
         </nav>
       </header>
+
+      <HireMeModal isOpen={isHireMeOpen} onClose={() => setIsHireMeOpen(false)} />
     </>
   );
 }

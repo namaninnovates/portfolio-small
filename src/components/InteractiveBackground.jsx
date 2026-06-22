@@ -4,13 +4,29 @@ import { useState, useEffect } from "react";
 export default function InteractiveBackground() {
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
   const [isHovering, setIsHovering] = useState(false);
+  const [cursorColor, setCursorColor] = useState('var(--color-primary-container)');
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
     const handlePointerMove = (e) => {
       setCursorPos({ x: e.clientX, y: e.clientY });
       const target = e.target;
-      setIsHovering(window.getComputedStyle(target).cursor === 'pointer');
+      // Check if the element or any of its parents are interactive
+      const isClickable = target.closest('a, button, input, select, textarea, [role="button"], label') !== null;
+      setIsHovering(isClickable);
+
+      // Dynamic cursor color contrast
+      if (target.closest('.bg-primary-container, .bg-primary')) {
+        setCursorColor('var(--color-cobalt)'); // Cobalt Blue against Lime Green
+      } else if (target.closest('.bg-secondary-container, .bg-secondary')) {
+        setCursorColor('var(--color-primary-container)'); // Lime Green against Orange
+      } else if (target.closest('.bg-cobalt')) {
+        setCursorColor('var(--color-secondary-container)'); // Orange against Cobalt Blue
+      } else if (target.closest('.bg-on-background')) {
+        setCursorColor('var(--color-primary-container)'); // Lime against Black
+      } else {
+        setCursorColor('var(--color-primary-container)'); // Default Lime
+      }
     };
 
     const handleScroll = () => {
@@ -87,7 +103,7 @@ export default function InteractiveBackground() {
 
         {/* Warped/Magnified Lens Layer on Mouse Cursor */}
         <div 
-          className="absolute inset-0 bg-grid-pattern opacity-100 transition-none z-30"
+          className="hidden md:block absolute inset-0 bg-grid-pattern opacity-100 transition-none z-30"
           style={{
             backgroundSize: '80px 80px', // EXTREME warp size
             backgroundPosition: `-${cursorPos.x * 0.1}px -${cursorPos.y * 0.1}px`, // more parallax drag
@@ -98,7 +114,7 @@ export default function InteractiveBackground() {
         
         {/* Glow behind the lens to accentuate the warp */}
         <div 
-          className="absolute inset-0 transition-none opacity-80 mix-blend-overlay z-30"
+          className="hidden md:block absolute inset-0 transition-none opacity-80 mix-blend-overlay z-30"
           style={{
             background: `radial-gradient(circle 180px at ${cursorPos.x}px ${cursorPos.y}px, var(--color-primary-container), transparent 100%)`
           }}
@@ -107,14 +123,14 @@ export default function InteractiveBackground() {
 
       {/* Custom Pointy Arrow Cursor */}
       <div 
-        className={`fixed top-0 left-0 pointer-events-none z-[9999] flex items-center justify-center transition-transform duration-75 ease-out`}
+        className={`hidden md:flex fixed top-0 left-0 pointer-events-none z-[9999] items-center justify-center transition-transform duration-75 ease-out`}
         style={{ 
           transform: `translate(${cursorPos.x - 2}px, ${cursorPos.y - 2}px) ${isHovering ? 'scale(1.2) rotate(-15deg)' : 'scale(1)'}`,
           transformOrigin: 'top left',
           filter: 'drop-shadow(4px 4px 0px #1b1c15)'
         }}
       >
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--color-primary-container)" stroke="var(--color-on-background)" strokeWidth="2">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill={cursorColor} stroke="var(--color-on-background)" strokeWidth="2" style={{ transition: 'fill 0.15s ease-out' }}>
           {/* Custom arrow shape starting at 2,2 */}
           <path d="M2 2l7.07 16.97 2.51-7.39 7.39-2.51L2 2z" strokeLinejoin="round" />
         </svg>

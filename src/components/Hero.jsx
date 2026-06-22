@@ -49,7 +49,14 @@ export default function Hero() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [windowHeight, setWindowHeight] = useState(1000);
+  const [isBulbHit, setIsBulbHit] = useState(false);
   const heroRef = useRef(null);
+
+  const handleBulbHit = () => {
+    if (isBulbHit) return;
+    setIsBulbHit(true);
+    setTimeout(() => setIsBulbHit(false), 2000);
+  };
 
   useEffect(() => {
     setWindowHeight(window.innerHeight);
@@ -61,8 +68,8 @@ export default function Hero() {
       const rect = heroRef.current.getBoundingClientRect();
       let progress = 0;
       if (rect.top <= 0) {
-        // max progress is 6 for a 600vh container (1 per 100vh)
-        progress = Math.max(0, Math.min(6, -rect.top / window.innerHeight));
+        // max progress is 4 for a 500vh container (1 per 100vh scrolling)
+        progress = Math.max(0, Math.min(5, -rect.top / window.innerHeight));
       }
       setScrollProgress(progress);
     };
@@ -128,18 +135,16 @@ export default function Hero() {
   const b3Opacity = e2;
   const b3Transform = `translateY(${b3Y}vh)`;
 
-  // Roadmap scroll: starts at 2.3, shorter 2.5 screen-height duration
-  const roadmapProgress = Math.max(0, Math.min(1, (scrollProgress - 2.3) / 2.5));
+  // Roadmap scroll: starts at 2.3, runs until 4.0
+  const roadmapProgress = Math.max(0, Math.min(1, (scrollProgress - 2.3) / 1.7));
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const maxScroll = isMobile 
-    ? Math.max(850, 1600 - windowHeight) 
-    : Math.max(650, 1400 - windowHeight);
+  const maxScroll = isMobile ? 550 : 250;
   const innerScrollY = -roadmapProgress * maxScroll;
 
   return (
-    <section ref={heroRef} className="relative h-[600vh] w-full">
+    <section ref={heroRef} className="relative h-[500vh] w-full">
       {/* perspective-origin on the sticky viewport gives the cylinder its vanishing point */}
-      <div className="sticky top-0 h-screen w-full" style={{ overflow: 'clip' }}>
+      <div className="sticky top-0 h-screen w-full overflow-hidden" style={{ overflow: 'clip' }}>
         
         {/* --- BLOCK 1: INTRO --- */}
         <div 
@@ -167,7 +172,7 @@ export default function Hero() {
             className="absolute top-10 left-2 md:left-4 bg-secondary-container text-on-secondary border-4 border-on-background py-2 px-8 -rotate-6 neo-shadow z-10 w-auto transition-transform duration-200 ease-out"
             style={{ transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px) rotate(-6deg)` }}
           >
-            <span className="font-label-mono text-label-mono uppercase whitespace-nowrap">3+ YEARS OF BUILDING &amp; EDITING</span>
+            <span className="font-label-mono text-label-mono uppercase whitespace-nowrap">6+ YEARS OF EDITING &amp; BUILDING</span>
           </div>
           
           {/* Floating Sticker */}
@@ -187,9 +192,9 @@ export default function Hero() {
             style={{ transform: `translate(${mousePos.x * -30}px, ${mousePos.y * -30}px)` }}
           >
             <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-none mb-8 tracking-tighter">
-              <span className="block -ml-2 hover:ml-2 transition-all duration-300"><span className="text-cobalt">CREATIVE</span> <span className="text-primary-container drop-shadow-[4px_4px_0_#1b1c15] md:drop-shadow-[8px_8px_0_#1b1c15] stroke-on-background" style={{ WebkitTextStroke: '2px #1b1c15' }}>BY DESIGN,</span></span>
-              <span className="block ml-4 hover:-ml-2 transition-all duration-300">EDITOR <span className="bg-on-background text-background px-4 inline-block -rotate-2">BY CRAFT,</span></span>
-              <span className="block text-secondary-container hover:text-on-background transition-colors duration-300">DEV BY CHOICE.</span>
+              <span className="block md:-ml-2 hover:ml-2 transition-all duration-300"><span className="text-cobalt">CREATIVE</span> <span className="text-primary-container drop-shadow-[4px_4px_0_#1b1c15] md:drop-shadow-[8px_8px_0_#1b1c15] stroke-on-background" style={{ WebkitTextStroke: '2px #1b1c15' }}>BY DESIGN,</span></span>
+              <span className="block md:ml-4 hover:-ml-2 transition-all duration-300">EDITOR <span className="bg-on-background text-background px-4 inline-block -rotate-2">BY CRAFT,</span></span>
+              <span className="block text-secondary-container hover:text-on-background transition-colors duration-300">DEV BY CHOICE</span>
             </h1>
             <p className="font-body-lg text-body-lg max-w-2xl bg-background border-l-8 border-primary-container pl-6 py-2 mb-12 relative mx-auto md:mx-0">
               <span className="absolute -left-6 -top-6 text-6xl text-on-background opacity-20 font-display-xl">&quot;</span>
@@ -214,11 +219,13 @@ export default function Hero() {
             className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-200 ease-out opacity-40 md:opacity-100 scale-75 md:scale-100"
             style={{ transform: `translate(${mousePos.x * 50}px, ${mousePos.y * 50}px)` }}
           >
-            <span className="absolute top-[10%] md:top-[20%] left-[5%] md:left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">psychology</span>Claude</span>
-            <span className="absolute top-[25%] md:top-[30%] right-[5%] md:right-[25%] bg-surface-container-high border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">design_services</span>Stitch</span>
-            <span className="absolute bottom-[20%] md:bottom-[15%] left-[5%] bg-secondary-fixed-dim border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">flight_takeoff</span>Antigravity</span>
-            <span className="absolute top-[65%] md:top-[70%] right-[5%] bg-primary-container border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">code</span>HTML/CSS</span>
+            <span className="absolute top-[10%] md:top-[20%] left-[5%] md:left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">data_object</span>JavaScript</span>
+            <span className="absolute top-[25%] md:top-[30%] right-[5%] md:right-[25%] bg-surface-container-high border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">science</span>React</span>
+            <span className="absolute bottom-[20%] md:bottom-[15%] left-[5%] bg-secondary-fixed-dim border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">animation</span>After Effects</span>
+            <span className="absolute top-[65%] md:top-[70%] right-[5%] bg-primary-container border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">draw</span>Figma</span>
             <span className="absolute bottom-[10%] md:bottom-[30%] left-[30%] md:left-[45%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[15deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">movie</span>Premiere Pro</span>
+            <span className="absolute top-[45%] left-[75%] md:left-[60%] bg-cobalt text-on-primary border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[20deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">terminal</span>Next.js</span>
+            <span className="absolute bottom-[35%] right-[20%] md:right-[15%] bg-secondary-container text-on-secondary border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-[10deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">water_drop</span>Tailwind CSS</span>
             <div className="absolute top-[15%] left-[50%] bg-dots w-16 h-16 rounded-full border-2 border-on-background opacity-50 hidden md:block"></div>
             <span className="absolute top-[5%] right-[30%] text-cobalt material-symbols-outlined text-4xl rotate-12 hidden md:inline-block">bolt</span>
           </div>
@@ -244,6 +251,34 @@ export default function Hero() {
             className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-container border-4 border-on-background mix-blend-multiply opacity-20 blur-3xl animate-pulse delay-700 transition-transform duration-200 ease-out"
             style={{ transform: `translate(${mousePos.x * -60}px, ${mousePos.y * -60}px)` }}
           ></div>
+
+          {/* Swinging Lightbulb */}
+          {scrollProgress > 0.4 && (
+            <div className="absolute top-0 left-[5%] md:left-[10%] origin-top animate-[bulb-swing_2.5s_ease-in-out_forwards] z-40 pointer-events-none" style={{ transformOrigin: 'top center' }}>
+              <div 
+                className="origin-top flex flex-col items-center cursor-pointer px-8 pointer-events-auto" 
+                style={{ 
+                  transformOrigin: 'top center',
+                  animation: isBulbHit ? 'bulb-hit 2s ease-in-out forwards' : 'none'
+                }}
+                onMouseEnter={handleBulbHit}
+                onClick={handleBulbHit}
+              >
+                {/* Wire */}
+                <div className="w-2 bg-on-background h-48 md:h-[350px] mx-auto shadow-[4px_0_0_0_#1b1c15]"></div>
+                {/* Socket */}
+                <div className="w-6 h-6 md:w-8 md:h-8 border-4 border-on-background bg-surface-variant mx-auto -mt-1 relative z-20 shadow-[4px_4px_0_0_#1b1c15] flex flex-col justify-evenly">
+                  <div className="w-full h-[2px] bg-on-background opacity-40"></div>
+                  <div className="w-full h-[2px] bg-on-background opacity-40"></div>
+                </div>
+                {/* Glass Bulb */}
+                <div className="w-10 h-10 md:w-16 md:h-16 border-4 border-on-background rounded-full mx-auto -mt-2 relative flex flex-col items-center justify-center bg-surface-container-high shadow-[4px_4px_0_0_#1b1c15] animate-[bulb-glow_0.1s_linear_2.2s_forwards] overflow-hidden">
+                  {/* Filament */}
+                  <div className="w-4 h-4 md:w-6 md:h-6 border-4 border-on-background rounded-t-full border-b-0 absolute bottom-1 md:bottom-2 opacity-80"></div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Floating Impact Words */}
           <div 
@@ -401,8 +436,8 @@ export default function Hero() {
           <div className="relative z-20 w-full max-w-6xl mx-auto transition-transform duration-200 ease-out"
             style={{ transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px) translateY(${innerScrollY}px)` }}>
             
-            <h2 className="font-display-xl text-headline-lg-mobile md:text-display-xl uppercase leading-none mb-2 drop-shadow-[4px_4px_0_#1b1c15] text-center">
-              HOW I <span className="bg-primary-container text-on-background px-4 inline-block -rotate-2">WORK</span>
+            <h2 className="font-display-xl text-headline-lg-mobile md:text-display-xl uppercase leading-none mb-2 text-center">
+              HOW I <span className="bg-primary-container text-on-background px-4 py-1 inline-block -rotate-2 border-[4px] border-on-background shadow-[4px_4px_0_0_#1b1c15] md:shadow-[8px_8px_0_0_#1b1c15]">WORK</span>
             </h2>
 
 
@@ -436,10 +471,10 @@ export default function Hero() {
 
               {/* Extremely Scattered Roadmap Steps */}
               {[
-                { title: "The Brain Dump", icon: "☕", copy: "We hop on a call. You talk, I frantically take notes and try to decode your startup buzzwords.", activeAt: 0, top: "5%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
-                { title: "Pixel Pushing", icon: "🕹️", copy: "I lock myself in a dark room with an unhealthy amount of caffeine until the grid yields to my will.", activeAt: 0.25, top: "28%", leftClasses: "left-2 md:left-12", rotate: "-rotate-3" },
-                { title: "The Polish", icon: "✨", copy: "Adding enough CSS shadows and scroll effects to make other developers mildly motion-sick.", activeAt: 0.5, top: "52%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
-                { title: "Launch & Pray", icon: "🚀", copy: "We hit deploy. I cross my fingers, you refresh the page. The internet gets a little bit cooler.", activeAt: 0.75, top: "76%", leftClasses: "left-2 md:left-1/4", rotate: "-rotate-6" }
+                { title: "The Brain Dump", icon: "☕", copy: "We hop on a call and you share your vision. I take detailed notes and promise not to judge your rough sketches.", activeAt: 0, top: "5%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
+                { title: "The Workshop", icon: "🛠️", copy: "I put my headphones on and get to work. Whether it's code, keyframes, or layouts, this is where the puzzle pieces start fitting together.", activeAt: 0.25, top: "28%", leftClasses: "left-2 md:left-12", rotate: "-rotate-3" },
+                { title: "The Polish", icon: "✨", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", activeAt: 0.5, top: "52%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
+                { title: "The Handoff", icon: "🚀", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", activeAt: 0.75, top: "76%", leftClasses: "left-2 md:left-1/4", rotate: "-rotate-6" }
               ].map((step, idx) => {
                 const isActive = roadmapProgress >= step.activeAt;
                 return (
