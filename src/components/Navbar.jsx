@@ -269,44 +269,21 @@ export default function Navbar() {
 
   const NAV_LINKS = ['Work', 'About', 'Contact'];
 
-  // Toggle scrolling when mobile menu is open
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMobileMenuOpen]);
-
-  return (
-    <>
-      <style>{`
-        @keyframes coinArc {
-          0%   { transform: translateY(0px)   scale(1);   opacity: 1; }
-          45%  { transform: translateY(-36px) scale(1.3); opacity: 1; }
-          100% { transform: translateY(-54px) scale(0.5); opacity: 0; }
-        }
-      `}</style>
-
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Popup */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-background flex flex-col items-center justify-center gap-8 md:hidden">
-          <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none"></div>
+        <div className="absolute top-[80px] right-4 z-40 bg-background border-4 border-on-background neo-shadow p-6 flex flex-col items-stretch gap-4 md:hidden w-64">
           {NAV_LINKS.map((label) => (
             <a
               key={label}
               href={`#${label.toLowerCase()}`}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="text-on-background font-display-xl text-5xl hover:text-cobalt hover:-rotate-2 transition-all duration-150 uppercase bg-primary-container px-6 py-2 border-4 border-on-background neo-shadow relative z-10"
+              className="text-on-background font-display-xl text-3xl hover:text-cobalt transition-all duration-150 uppercase bg-primary-container px-6 py-2 border-4 border-on-background neo-shadow text-center rotate-1"
             >
               {label}
             </a>
           ))}
           <button 
-            className="mt-8 bg-secondary text-on-secondary border-4 border-on-background px-8 py-4 font-headline-md text-3xl uppercase neo-shadow transition-all duration-150 -rotate-2 relative z-10"
+            className="mt-2 bg-secondary text-on-secondary border-4 border-on-background px-6 py-3 font-headline-md text-2xl uppercase neo-shadow transition-all duration-150 -rotate-2 text-center"
             onClick={() => { setIsMobileMenuOpen(false); setIsHireMeOpen(true); }}
           >
             Hire Me

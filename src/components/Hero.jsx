@@ -75,19 +75,37 @@ export default function Hero() {
     };
     
     const handlePointerMove = (e) => {
+      if (e.pointerType === "touch") return;
       const x = (e.clientX / window.innerWidth - 0.5) * 2;
       const y = (e.clientY / window.innerHeight - 0.5) * 2;
       setMousePos({ x, y });
     };
 
+    let lastGyroTime = 0;
+    const handleOrientation = (e) => {
+      if (e.gamma === null || e.beta === null) return;
+      
+      const now = performance.now();
+      // Throttle to 10fps to let CSS transitions smoothly interpolate and remove jitter
+      if (now - lastGyroTime < 100) return;
+      lastGyroTime = now;
+
+      // Dampen sensitivity by 50% for mobile
+      let x = Math.max(-1, Math.min(1, e.gamma / 90)) * 0.5;
+      let y = Math.max(-1, Math.min(1, (e.beta - 45) / 90)) * 0.5;
+      setMousePos({ x, y });
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("deviceorientation", handleOrientation);
     handleScroll(); // initialize
     
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("deviceorientation", handleOrientation);
     };
   }, []);
 
@@ -205,16 +223,16 @@ export default function Hero() {
 
           {/* Tool Chips Scattered */}
           <div 
-            className="hidden md:block absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-200 ease-out opacity-40 md:opacity-100 scale-75 md:scale-100"
+            className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-[400ms] md:duration-200 ease-out opacity-60 md:opacity-100 scale-75 md:scale-100"
             style={{ transform: `translate(${mousePos.x * 50}px, ${mousePos.y * 50}px)` }}
           >
-            <span className="absolute top-[10%] md:top-[20%] left-[5%] md:left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">data_object</span>JavaScript</span>
-            <span className="absolute top-[25%] md:top-[30%] right-[5%] md:right-[25%] bg-surface-container-high border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">science</span>React</span>
+            <span className="absolute top-[8%] md:top-[20%] left-[5%] md:left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">data_object</span>JavaScript</span>
+            <span className="absolute top-[18%] md:top-[30%] right-[5%] md:right-[25%] bg-surface-container-high border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">science</span>React</span>
             <span className="absolute bottom-[20%] md:bottom-[15%] left-[5%] bg-secondary-fixed-dim border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">animation</span>After Effects</span>
-            <span className="absolute top-[65%] md:top-[70%] right-[5%] bg-primary-container border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">draw</span>Figma</span>
-            <span className="absolute bottom-[10%] md:bottom-[30%] left-[30%] md:left-[45%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[15deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">movie</span>Premiere Pro</span>
-            <span className="absolute top-[45%] left-[75%] md:left-[60%] bg-cobalt text-on-primary border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[20deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">terminal</span>Next.js</span>
-            <span className="absolute bottom-[35%] right-[20%] md:right-[15%] bg-secondary-container text-on-secondary border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-[10deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">water_drop</span>Tailwind CSS</span>
+            <span className="absolute bottom-[10%] md:bottom-auto md:top-[70%] right-[5%] bg-primary-container border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">draw</span>Figma</span>
+            <span className="absolute bottom-[2%] md:bottom-[30%] left-[30%] md:left-[45%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[15deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">movie</span>Premiere Pro</span>
+            <span className="absolute top-[2%] md:top-[45%] right-[30%] md:right-auto md:left-[60%] bg-cobalt text-on-primary border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[20deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">terminal</span>Next.js</span>
+            <span className="absolute bottom-[15%] md:bottom-[35%] right-[20%] md:right-[15%] bg-secondary-container text-on-secondary border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-[10deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">water_drop</span>Tailwind CSS</span>
             <div className="absolute top-[15%] left-[50%] bg-dots w-16 h-16 rounded-full border-2 border-on-background opacity-50 hidden md:block"></div>
             <span className="absolute top-[5%] right-[30%] text-cobalt material-symbols-outlined text-4xl rotate-12 hidden md:inline-block">bolt</span>
           </div>
@@ -390,7 +408,7 @@ export default function Hero() {
           <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
             {/* Layer 1 (Deepest, Slowest) */}
             <div 
-              className="absolute inset-0 opacity-30 transition-transform duration-200 ease-out"
+              className="absolute inset-0 opacity-30 transition-transform duration-[400ms] md:duration-200 ease-out"
               style={{ transform: `translate(${mousePos.x * -2}px, ${mousePos.y * -2}px) translateY(${innerScrollY * 0.1}px)` }}
             >
               <div className="absolute top-[10%] left-[15%] -rotate-12 scale-75"><MarioPipe /></div>
@@ -401,7 +419,7 @@ export default function Hero() {
 
             {/* Layer 2 (Middle Depth) */}
             <div 
-              className="absolute inset-0 opacity-50 transition-transform duration-200 ease-out"
+              className="absolute inset-0 opacity-50 transition-transform duration-[400ms] md:duration-200 ease-out"
               style={{ transform: `translate(${mousePos.x * -4}px, ${mousePos.y * -4}px) translateY(${innerScrollY * 0.25}px)` }}
             >
               <div className="absolute top-[5%] left-[30%] rotate-6 scale-90"><MarioCoin /></div>
@@ -412,7 +430,7 @@ export default function Hero() {
 
             {/* Layer 3 (Closest Background, Fastest) */}
             <div 
-              className="absolute inset-0 opacity-80 transition-transform duration-200 ease-out"
+              className="absolute inset-0 opacity-80 transition-transform duration-[400ms] md:duration-200 ease-out"
               style={{ transform: `translate(${mousePos.x * -7}px, ${mousePos.y * -7}px) translateY(${innerScrollY * 0.45}px)` }}
             >
               <div className="absolute top-[15%] right-[15%] rotate-12 scale-110"><MarioQuestion /></div>
@@ -429,13 +447,11 @@ export default function Hero() {
               HOW I <span className="bg-primary-container text-on-background px-4 py-1 inline-block -rotate-2 border-[4px] border-on-background shadow-[4px_4px_0_0_#1b1c15] md:shadow-[8px_8px_0_0_#1b1c15]">WORK</span>
             </h2>
 
-
-
             {/* The Animated Roadmap */}
             <div className="w-full h-[1100px] md:h-[850px] max-w-6xl mx-auto relative mt-8 pb-8">
               
-              {/* Extremely Curvy Snake SVG Timeline */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
+              {/* Extremely Curvy Snake SVG Timeline (Desktop) */}
+              <svg className="hidden md:block absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <path 
                   d="M 5 0 C 5 15, 85 5, 85 20 C 85 40, 5 30, 5 45 C 5 65, 90 55, 90 70 C 90 90, 30 85, 40 100" 
                   fill="none" 
@@ -458,12 +474,36 @@ export default function Hero() {
                 />
               </svg>
 
+              {/* Straight Timeline (Mobile) */}
+              <svg className="md:hidden absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path 
+                  d="M 8 0 L 8 100" 
+                  fill="none" 
+                  stroke="var(--color-on-background)" 
+                  strokeWidth="4" 
+                  strokeDasharray="6 6" 
+                  vectorEffect="non-scaling-stroke" 
+                  className="opacity-20"
+                />
+                <path 
+                  d="M 8 0 L 8 100" 
+                  fill="none" 
+                  stroke="var(--color-cobalt)" 
+                  strokeWidth="8" 
+                  vectorEffect="non-scaling-stroke" 
+                  pathLength="100"
+                  strokeDasharray="100"
+                  strokeDashoffset={100 - roadmapProgress * 100}
+                  className="transition-all duration-75 drop-shadow-[0_0_8px_var(--color-cobalt)]"
+                />
+              </svg>
+
               {/* Extremely Scattered Roadmap Steps */}
               {[
-                { title: "The Brain Dump", icon: "☕", copy: "We hop on a call and you share your vision. I take detailed notes and promise not to judge your rough sketches.", activeAt: 0, top: "5%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
-                { title: "The Workshop", icon: "🛠️", copy: "I put my headphones on and get to work. Whether it's code, keyframes, or layouts, this is where the puzzle pieces start fitting together.", activeAt: 0.25, top: "28%", leftClasses: "left-2 md:left-12", rotate: "-rotate-3" },
-                { title: "The Polish", icon: "✨", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", activeAt: 0.5, top: "52%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
-                { title: "The Handoff", icon: "🚀", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", activeAt: 0.75, top: "76%", leftClasses: "left-2 md:left-1/4", rotate: "-rotate-6" }
+                { title: "The Brain Dump", icon: "☕", copy: "We hop on a call and you share your vision. I take detailed notes and promise not to judge your rough sketches.", activeAt: 0.05, top: "5%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
+                { title: "The Workshop", icon: "🛠️", copy: "I put my headphones on and get to work. Whether it's code, keyframes, or layouts, this is where the puzzle pieces start fitting together.", activeAt: 0.28, top: "28%", leftClasses: "left-2 md:left-12", rotate: "-rotate-3" },
+                { title: "The Polish", icon: "✨", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", activeAt: 0.52, top: "52%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
+                { title: "The Handoff", icon: "🚀", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", activeAt: 0.76, top: "76%", leftClasses: "left-2 md:left-1/4", rotate: "-rotate-6" }
               ].map((step, idx) => {
                 const isActive = roadmapProgress >= step.activeAt;
                 return (
@@ -472,12 +512,12 @@ export default function Hero() {
                     style={{ top: step.top }}
                   >
                     {/* Content Box */}
-                    <div className={`border-4 border-on-background p-4 md:p-6 transition-all duration-500 ease-out ${isActive ? 'bg-background neo-shadow opacity-100 scale-100' : 'bg-surface-container-high opacity-50 grayscale scale-75 blur-[1px] -translate-y-8'}`}>
-                      <div className="flex items-center gap-4 mb-2 border-b-4 border-on-background pb-2">
-                        <span className={`text-4xl flex-shrink-0 bg-secondary text-on-secondary border-4 border-on-background w-16 h-16 flex items-center justify-center neo-shadow transition-transform duration-500 ${isActive ? '-rotate-12 scale-110' : 'rotate-0 scale-100'}`}>{step.icon}</span>
-                        <h3 className="font-headline-md text-[20px] md:text-[26px] uppercase leading-tight">{step.title}</h3>
+                    <div className={`border-4 border-on-background p-3 md:p-6 transition-all duration-500 ease-out ${isActive ? 'bg-background neo-shadow opacity-100 scale-100' : 'bg-surface-container-high opacity-50 grayscale scale-[0.6] md:scale-75 blur-[1px] -translate-y-8'}`}>
+                      <div className="flex items-center gap-3 md:gap-4 mb-2 border-b-4 border-on-background pb-2">
+                        <span className={`text-2xl md:text-4xl flex-shrink-0 bg-secondary text-on-secondary border-4 border-on-background w-12 h-12 md:w-16 md:h-16 flex items-center justify-center neo-shadow transition-transform duration-500 ${isActive ? '-rotate-12 scale-110' : 'rotate-0 scale-100'}`}>{step.icon}</span>
+                        <h3 className="font-headline-md text-[16px] md:text-[26px] uppercase leading-tight">{step.title}</h3>
                       </div>
-                      <p className="font-label-mono text-[13px] md:text-label-mono text-on-surface-variant pt-2">
+                      <p className="font-label-mono text-[12px] md:text-label-mono text-on-surface-variant pt-2">
                         <span className="text-cobalt mr-2">&gt;</span> {step.copy}
                         {isActive && <span className="animate-pulse ml-1 inline-block w-2 h-4 bg-cobalt"></span>}
                       </p>
