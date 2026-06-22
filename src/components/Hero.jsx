@@ -118,10 +118,11 @@ export default function Hero() {
   const b3Transform = `translateY(${b3Y}vh)`;
 
   // Roadmap scroll: starts at 2.3, shorter 2.5 screen-height duration
-  // maxScroll has a hard floor of 650px so the 4th card (at 85% of 850px = ~722px)
-  // always scrolls fully into view regardless of screen height
   const roadmapProgress = Math.max(0, Math.min(1, (scrollProgress - 2.3) / 2.5));
-  const maxScroll = Math.max(650, 1400 - windowHeight);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const maxScroll = isMobile 
+    ? Math.max(850, 1600 - windowHeight) 
+    : Math.max(650, 1400 - windowHeight);
   const innerScrollY = -roadmapProgress * maxScroll;
 
   return (
@@ -199,16 +200,16 @@ export default function Hero() {
 
           {/* Tool Chips Scattered */}
           <div 
-            className="hidden md:block absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-200 ease-out"
+            className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-200 ease-out opacity-40 md:opacity-100 scale-75 md:scale-100"
             style={{ transform: `translate(${mousePos.x * 50}px, ${mousePos.y * 50}px)` }}
           >
-            <span className="absolute top-[20%] left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">psychology</span>Claude</span>
-            <span className="absolute top-[30%] right-[25%] bg-surface-container-high border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">design_services</span>Stitch</span>
-            <span className="absolute bottom-[15%] left-[5%] bg-secondary-fixed-dim border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">flight_takeoff</span>Antigravity</span>
-            <span className="absolute top-[70%] right-[5%] bg-primary-container border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">code</span>HTML/CSS</span>
-            <span className="absolute bottom-[30%] left-[45%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[15deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">movie</span>Premiere Pro</span>
-            <div className="absolute top-[15%] left-[50%] bg-dots w-16 h-16 rounded-full border-2 border-on-background opacity-50"></div>
-            <span className="absolute top-[5%] right-[30%] text-cobalt material-symbols-outlined text-4xl rotate-12">bolt</span>
+            <span className="absolute top-[10%] md:top-[20%] left-[5%] md:left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">psychology</span>Claude</span>
+            <span className="absolute top-[25%] md:top-[30%] right-[5%] md:right-[25%] bg-surface-container-high border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">design_services</span>Stitch</span>
+            <span className="absolute bottom-[20%] md:bottom-[15%] left-[5%] bg-secondary-fixed-dim border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">flight_takeoff</span>Antigravity</span>
+            <span className="absolute top-[65%] md:top-[70%] right-[5%] bg-primary-container border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">code</span>HTML/CSS</span>
+            <span className="absolute bottom-[10%] md:bottom-[30%] left-[30%] md:left-[45%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[15deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">movie</span>Premiere Pro</span>
+            <div className="absolute top-[15%] left-[50%] bg-dots w-16 h-16 rounded-full border-2 border-on-background opacity-50 hidden md:block"></div>
+            <span className="absolute top-[5%] right-[30%] text-cobalt material-symbols-outlined text-4xl rotate-12 hidden md:inline-block">bolt</span>
           </div>
         </div>
 
@@ -235,12 +236,12 @@ export default function Hero() {
 
           {/* Floating Impact Words */}
           <div 
-            className="absolute inset-0 pointer-events-none hidden md:block transition-transform duration-200 ease-out"
+            className="absolute inset-0 pointer-events-none transition-transform duration-200 ease-out opacity-30 md:opacity-100 scale-75 md:scale-100"
             style={{ transform: `translate(${mousePos.x * 80}px, ${mousePos.y * 80}px)` }}
           >
-            <span className="absolute top-[15%] right-[15%] bg-cobalt text-on-primary border-4 border-on-background px-6 py-2 font-headline-md text-headline-md uppercase rotate-6 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">FAST</span>
-            <span className="absolute bottom-[20%] left-[10%] bg-secondary-container text-on-secondary border-4 border-on-background px-6 py-2 font-headline-md text-headline-md uppercase -rotate-12 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">KINETIC</span>
-            <span className="absolute top-[40%] left-[5%] bg-primary-container text-on-background border-4 border-on-background px-6 py-2 font-headline-md text-headline-md uppercase rotate-3 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">LOUD</span>
+            <span className="absolute top-[5%] md:top-[15%] right-[5%] md:right-[15%] bg-cobalt text-on-primary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-6 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">FAST</span>
+            <span className="absolute bottom-[10%] md:bottom-[20%] left-[5%] md:left-[10%] bg-secondary-container text-on-secondary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase -rotate-12 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">KINETIC</span>
+            <span className="absolute top-[80%] md:top-[40%] left-[10%] md:left-[5%] bg-primary-container text-on-background border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-3 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">LOUD</span>
           </div>
 
           {/* Content */}
@@ -396,7 +397,7 @@ export default function Hero() {
 
 
             {/* The Animated Roadmap */}
-            <div className="w-full h-[850px] max-w-6xl mx-auto relative mt-8 pb-8">
+            <div className="w-full h-[1100px] md:h-[850px] max-w-6xl mx-auto relative mt-8 pb-8">
               
               {/* Extremely Curvy Snake SVG Timeline */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -424,24 +425,24 @@ export default function Hero() {
 
               {/* Extremely Scattered Roadmap Steps */}
               {[
-                { title: "The Brain Dump", icon: "☕", copy: "We hop on a call. You talk, I frantically take notes and try to decode your startup buzzwords.", activeAt: 0, top: "10%", leftClasses: "left-4 md:left-1/2", rotate: "rotate-6" },
-                { title: "Pixel Pushing", icon: "🕹️", copy: "I lock myself in a dark room with an unhealthy amount of caffeine until the grid yields to my will.", activeAt: 0.25, top: "35%", leftClasses: "left-8 md:left-12", rotate: "-rotate-3" },
-                { title: "The Polish", icon: "✨", copy: "Adding enough CSS shadows and scroll effects to make other developers mildly motion-sick.", activeAt: 0.5, top: "60%", leftClasses: "left-4 md:left-1/2", rotate: "rotate-6" },
-                { title: "Launch & Pray", icon: "🚀", copy: "We hit deploy. I cross my fingers, you refresh the page. The internet gets a little bit cooler.", activeAt: 0.75, top: "85%", leftClasses: "left-8 md:left-1/4", rotate: "-rotate-6" }
+                { title: "The Brain Dump", icon: "☕", copy: "We hop on a call. You talk, I frantically take notes and try to decode your startup buzzwords.", activeAt: 0, top: "5%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
+                { title: "Pixel Pushing", icon: "🕹️", copy: "I lock myself in a dark room with an unhealthy amount of caffeine until the grid yields to my will.", activeAt: 0.25, top: "28%", leftClasses: "left-2 md:left-12", rotate: "-rotate-3" },
+                { title: "The Polish", icon: "✨", copy: "Adding enough CSS shadows and scroll effects to make other developers mildly motion-sick.", activeAt: 0.5, top: "52%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
+                { title: "Launch & Pray", icon: "🚀", copy: "We hit deploy. I cross my fingers, you refresh the page. The internet gets a little bit cooler.", activeAt: 0.75, top: "76%", leftClasses: "left-2 md:left-1/4", rotate: "-rotate-6" }
               ].map((step, idx) => {
                 const isActive = roadmapProgress >= step.activeAt;
                 return (
                   <div key={idx} 
-                    className={`absolute ${step.leftClasses} w-[90%] md:w-[45%] group z-10 transition-transform duration-500 ease-out ${isActive ? step.rotate : 'rotate-0'}`}
+                    className={`absolute ${step.leftClasses} w-[92%] md:w-[45%] group z-10 transition-transform duration-500 ease-out ${isActive ? step.rotate : 'rotate-0'}`}
                     style={{ top: step.top }}
                   >
                     {/* Content Box */}
                     <div className={`border-4 border-on-background p-4 md:p-6 transition-all duration-500 ease-out ${isActive ? 'bg-background neo-shadow opacity-100 scale-100' : 'bg-surface-container-high opacity-50 grayscale scale-75 blur-[1px] -translate-y-8'}`}>
                       <div className="flex items-center gap-4 mb-2 border-b-4 border-on-background pb-2">
                         <span className={`text-4xl flex-shrink-0 bg-secondary text-on-secondary border-4 border-on-background w-16 h-16 flex items-center justify-center neo-shadow transition-transform duration-500 ${isActive ? '-rotate-12 scale-110' : 'rotate-0 scale-100'}`}>{step.icon}</span>
-                        <h3 className="font-headline-md text-[22px] md:text-[26px] uppercase leading-tight">{step.title}</h3>
+                        <h3 className="font-headline-md text-[20px] md:text-[26px] uppercase leading-tight">{step.title}</h3>
                       </div>
-                      <p className="font-label-mono text-label-mono text-on-surface-variant pt-2">
+                      <p className="font-label-mono text-[13px] md:text-label-mono text-on-surface-variant pt-2">
                         <span className="text-cobalt mr-2">&gt;</span> {step.copy}
                         {isActive && <span className="animate-pulse ml-1 inline-block w-2 h-4 bg-cobalt"></span>}
                       </p>

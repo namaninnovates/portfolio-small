@@ -134,7 +134,7 @@ const DinoPlanet = () => {
 
 export default function Footer() {
   return (
-    <footer className="w-full mt-stack-overlap border-t-8 border-on-background shadow-[8px_8px_0px_0px_#000000] bg-secondary text-on-secondary relative z-30 overflow-visible">
+    <footer className="w-full mt-stack-overlap border-t-8 border-on-background shadow-[8px_8px_0px_0px_#000000] bg-secondary text-on-secondary relative z-30" style={{ overflowX: 'clip' }}>
       <DinoPlanet />
       {/* Decorative Background Starburst */}
       <div className="absolute -right-20 -top-20 w-64 h-64 bg-primary-container rotate-45 border-8 border-on-background opacity-20"></div>

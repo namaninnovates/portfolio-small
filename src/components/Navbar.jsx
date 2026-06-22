@@ -143,6 +143,7 @@ export default function Navbar() {
   const [tabBumps, setTabBumps] = useState([false, false, false]);
   const [coins, setCoins]       = useState([]);
   const [display, setDisplay]   = useState({ x: -50, y: 0, frame: 0, dir: 1 });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const spawnCoin = (absX) => {
     setCoins(prev => [...prev, { id: Date.now() + Math.random(), x: absX }]);
@@ -165,7 +166,7 @@ export default function Navbar() {
       if (!navRef.current) return [];
       const nr = navRef.current.getBoundingClientRect();
       return linkRefs.current.map(el => {
-        if (!el) return -999;
+        if (!el || el.offsetParent === null) return -999; // Check if hidden
         const r = el.getBoundingClientRect();
         return r.left - nr.left + r.width / 2;
       });
@@ -184,6 +185,7 @@ export default function Navbar() {
       // ── TAB HIT CHECK (only on ground) ──────────────────
       if (!s.jumping && s.y === 0) {
         for (let i = 0; i < tabXs.length; i++) {
+          if (tabXs[i] < 0) continue; // Skip hidden tabs
           const dist = (tabXs[i] - s.x) * s.dir;
           if (dist > 0 && dist < TRIG_TAB && !tabCooldowns.current[i]) {
             s.jumping   = true;
@@ -265,6 +267,18 @@ export default function Navbar() {
 
   const NAV_LINKS = ['Work', 'About', 'Contact'];
 
+  // Toggle scrolling when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <>
       <style>{`
@@ -275,14 +289,37 @@ export default function Navbar() {
         }
       `}</style>
 
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-40 bg-background flex flex-col items-center justify-center gap-8 md:hidden">
+          <div className="absolute inset-0 bg-grid-pattern opacity-20 pointer-events-none"></div>
+          {NAV_LINKS.map((label) => (
+            <a
+              key={label}
+              href={`#${label.toLowerCase()}`}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-on-background font-display-xl text-5xl hover:text-cobalt hover:-rotate-2 transition-all duration-150 uppercase bg-primary-container px-6 py-2 border-4 border-on-background neo-shadow relative z-10"
+            >
+              {label}
+            </a>
+          ))}
+          <button 
+            className="mt-8 bg-secondary text-on-secondary border-4 border-on-background px-8 py-4 font-headline-md text-3xl uppercase neo-shadow transition-all duration-150 -rotate-2 relative z-10"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            Hire Me
+          </button>
+        </div>
+      )}
+
       <header
         className="w-full top-0 sticky z-50 bg-background border-b-4 border-on-background shadow-[8px_8px_0px_0px_#000000]"
-        style={{ overflow: 'visible' }}
+        style={{ overflowX: 'clip', overflowY: 'visible' }}
       >
         <nav
           ref={navRef}
-          className="relative flex justify-between items-end w-full px-margin-mobile md:px-margin-desktop py-gutter max-w-full"
-          style={{ minHeight: 64, overflow: 'visible' }}
+          className="relative flex justify-between items-end md:items-end items-center w-full px-margin-mobile md:px-margin-desktop py-gutter max-w-full"
+          style={{ minHeight: 64, overflowX: 'clip', overflowY: 'visible' }}
         >
           {/* ── Pipes ─────────────────────────────────────── */}
           {PIPES.map((p, i) => (
@@ -344,10 +381,20 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* ── Hire Me ─────────────────────────────────── */}
-          <button className="bg-primary-container text-on-background border-4 border-on-background px-6 py-2 font-label-mono text-label-mono uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2 z-30 relative mb-1">
-            Hire Me
-          </button>
+          <div className="flex items-center gap-4 z-30 relative mb-1">
+            {/* ── Hire Me ─────────────────────────────────── */}
+            <button className="hidden md:block bg-primary-container text-on-background border-4 border-on-background px-6 py-2 font-label-mono text-label-mono uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2">
+              Hire Me
+            </button>
+
+            {/* ── Mobile Toggle ────────────────────────────── */}
+            <button 
+              className="md:hidden bg-secondary-container text-on-secondary border-4 border-on-background p-2 w-12 h-12 flex items-center justify-center neo-shadow hover:bg-cobalt hover:text-on-primary transition-all rotate-3"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <span className="material-symbols-outlined font-bold">{isMobileMenuOpen ? 'close' : 'menu'}</span>
+            </button>
+          </div>
         </nav>
       </header>
     </>
