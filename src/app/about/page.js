@@ -59,7 +59,7 @@ export default function AboutPage() {
         <div className="absolute bottom-10 left-10 w-96 h-96 bg-secondary-container mix-blend-multiply opacity-40 blur-3xl -z-10"></div>
         
         {/* Minecraft Mining Scene */}
-        <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20 flex items-end gap-0 group pointer-events-none">
+        <div className="hidden absolute bottom-4 left-4 md:bottom-8 md:left-8 z-20 flex items-end gap-0 group pointer-events-none">
           <style>{`
             @keyframes mine-swing {
               0%, 100% { transform: rotate(0deg); } /* Relaxed, pointing top-right */
@@ -144,7 +144,7 @@ export default function AboutPage() {
             </div>
             {/* Decorative Brutalist Elements */}
             <div className="absolute -top-6 -right-6 w-16 h-16 bg-secondary text-on-secondary rounded-full border-4 border-on-background flex items-center justify-center animate-spin-slow neo-shadow">
-              <span className="font-label-mono text-[10px] uppercase text-center leading-tight">GRID<br/>BREAKER</span>
+              <span className="font-label-mono text-[10px] uppercase text-center leading-tight">100%<br/>REAL</span>
             </div>
           </div>
         </div>
