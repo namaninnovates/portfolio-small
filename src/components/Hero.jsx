@@ -47,8 +47,8 @@ const MarioQuestion = () => (
 
 export default function Hero() {
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [cursorPx, setCursorPx] = useState({ x: -1000, y: -1000 });
+  
+  
   const [windowHeight, setWindowHeight] = useState(1000);
   const [isBulbHit, setIsBulbHit] = useState(false);
   const heroRef = useRef(null);
@@ -86,8 +86,12 @@ export default function Hero() {
       pointerRaf = requestAnimationFrame(() => {
         const x = (e.clientX / window.innerWidth - 0.5) * 2;
         const y = (e.clientY / window.innerHeight - 0.5) * 2;
-        setMousePos({ x, y });
-        setCursorPx({ x: e.clientX, y: e.clientY });
+        if (heroRef.current) {
+          heroRef.current.style.setProperty('--mx', x);
+          heroRef.current.style.setProperty('--my', y);
+          heroRef.current.style.setProperty('--cx', e.clientX + 'px');
+          heroRef.current.style.setProperty('--cy', e.clientY + 'px');
+        }
       });
     };
 
@@ -106,7 +110,10 @@ export default function Hero() {
         // Dampen sensitivity by 60% for smooth mobile feel
         let x = Math.max(-1, Math.min(1, e.gamma / 90)) * 0.4;
         let y = Math.max(-1, Math.min(1, (e.beta - 45) / 90)) * 0.4;
-        setMousePos({ x, y });
+        if (heroRef.current) {
+          heroRef.current.style.setProperty('--mx', x);
+          heroRef.current.style.setProperty('--my', y);
+        }
       });
     };
 
@@ -175,9 +182,9 @@ export default function Hero() {
           className="absolute inset-0 bg-grid-pattern opacity-100 pointer-events-none z-0"
           style={{
             backgroundSize: '80px 80px',
-            backgroundPosition: `-${mousePos.x * 20}px -${mousePos.y * 20}px`,
-            WebkitMaskImage: `radial-gradient(circle 250px at ${cursorPx.x}px ${cursorPx.y}px, black 30%, transparent 100%)`,
-            maskImage: `radial-gradient(circle 250px at ${cursorPx.x}px ${cursorPx.y}px, black 30%, transparent 100%)`,
+            backgroundPosition: `-calc(var(--mx, 0) * 20)px -calc(var(--my, 0) * 20)px`,
+            WebkitMaskImage: `radial-gradient(circle 250px at var(--cx, -1000px) var(--cy, -1000px), black 30%, transparent 100%)`,
+            maskImage: `radial-gradient(circle 250px at var(--cx, -1000px) var(--cy, -1000px), black 30%, transparent 100%)`,
           }}
         ></div>
         {/* --- BLOCK 1: INTRO --- */}
@@ -193,17 +200,17 @@ export default function Hero() {
           {/* Background Elements */}
           <div 
             className="absolute top-20 right-10 md:right-32 w-32 h-32 bg-primary-container border-4 border-on-background rounded-full mix-blend-multiply opacity-50 blur-3xl animate-pulse transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * 40}px, ${mousePos.y * 40 + scrollProgress * 200}px)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * 40)px, calc(var(--my, 0) * 40 + ${scrollProgress * 200})px)` }}
           ></div>
           <div 
             className="absolute bottom-20 left-10 md:left-32 w-48 h-48 bg-secondary-container border-4 border-on-background mix-blend-multiply opacity-40 blur-2xl animate-pulse delay-1000 transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * 60}px, ${mousePos.y * 60 + scrollProgress * 150}px)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * 60)px, calc(var(--my, 0) * 60 + ${scrollProgress * 150})px)` }}
           ></div>
           
           {/* Experience Ribbon */}
           <div 
             className="absolute top-2 md:top-10 left-2 md:left-4 bg-secondary-container text-on-secondary border-4 border-on-background py-1 px-4 md:py-2 md:px-8 -rotate-6 neo-shadow z-10 w-auto transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px) rotate(-6deg)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * -20)px, calc(var(--my, 0) * -20)px) rotate(-6deg)` }}
           >
             <span className="font-label-mono text-[10px] md:text-label-mono uppercase whitespace-nowrap">6+ YEARS OF EDITING &amp; BUILDING</span>
           </div>
@@ -211,7 +218,7 @@ export default function Hero() {
           {/* Floating Sticker */}
           <div 
             className="absolute top-10 right-2 md:right-4 bg-background border-4 border-on-background py-3 px-6 rotate-12 neo-shadow z-10 hidden md:block transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * -15}px, ${mousePos.y * -15}px) rotate(12deg)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * -15)px, calc(var(--my, 0) * -15)px) rotate(12deg)` }}
           >
             <span className="font-label-mono text-label-mono uppercase flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-primary-fixed animate-ping"></div>
@@ -222,7 +229,7 @@ export default function Hero() {
           {/* Main Content */}
           <div 
             className="relative z-20 max-w-5xl mx-auto text-center md:text-left transition-transform duration-200 ease-out mt-12 md:mt-24"
-            style={{ transform: `translate(${mousePos.x * -30}px, ${mousePos.y * -30}px)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * -30)px, calc(var(--my, 0) * -30)px)` }}
           >
             <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-[1.1] md:leading-none mb-4 md:mb-8 tracking-tighter">
               <span className="block md:-ml-2 hover:ml-2 transition-all duration-300"><span className="text-cobalt">CREATIVE</span> <span className="text-primary-container drop-shadow-[4px_4px_0_#1b1c15] md:drop-shadow-[8px_8px_0_#1b1c15] stroke-on-background" style={{ WebkitTextStroke: '2px #1b1c15' }}>BY DESIGN,</span></span>
@@ -250,7 +257,7 @@ export default function Hero() {
           {/* Tool Chips Scattered */}
           <div 
             className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-[400ms] md:duration-200 ease-out opacity-60 md:opacity-100 scale-75 md:scale-100"
-            style={{ transform: `translate(${mousePos.x * 50}px, ${mousePos.y * 50 + scrollProgress * 120}px)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * 50)px, calc(var(--my, 0) * 50 + ${scrollProgress * 120})px)` }}
           >
             <span className="absolute top-[8%] md:top-[20%] left-[5%] md:left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">data_object</span>JavaScript</span>
             <span className="absolute top-[18%] md:top-[30%] right-[5%] md:right-[25%] bg-surface-container-high border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">science</span>React</span>
@@ -277,11 +284,11 @@ export default function Hero() {
           {/* New Background Elements */}
           <div 
             className="absolute top-1/4 left-1/4 w-64 h-64 bg-cobalt border-4 border-on-background rounded-full mix-blend-multiply opacity-30 blur-3xl animate-pulse transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * 60}px, ${mousePos.y * 60 + scrollProgress * 180}px)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * 60)px, calc(var(--my, 0) * 60 + ${scrollProgress * 180})px)` }}
           ></div>
           <div 
             className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-container border-4 border-on-background mix-blend-multiply opacity-20 blur-3xl animate-pulse delay-700 transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * -60}px, ${mousePos.y * -60 + scrollProgress * 130}px)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * -60)px, calc(var(--my, 0) * -60 + ${scrollProgress * 130})px)` }}
           ></div>
 
           {/* Swinging Lightbulb */}
@@ -315,7 +322,7 @@ export default function Hero() {
           {/* Floating Impact Words */}
           <div 
             className="absolute inset-0 pointer-events-none transition-transform duration-200 ease-out opacity-30 md:opacity-100 scale-75 md:scale-100"
-            style={{ transform: `translate(${mousePos.x * 80}px, ${mousePos.y * 80 + scrollProgress * 80}px)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * 80)px, calc(var(--my, 0) * 80 + ${scrollProgress * 80})px)` }}
           >
             <span className="absolute top-[5%] md:top-[15%] right-[5%] md:right-[15%] bg-cobalt text-on-primary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-6 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">FAST</span>
             <span className="absolute bottom-[10%] md:bottom-[20%] left-[5%] md:left-[10%] bg-secondary-container text-on-secondary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase -rotate-12 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">KINETIC</span>
@@ -325,7 +332,7 @@ export default function Hero() {
           {/* Content */}
           <div 
             className="relative z-20 max-w-4xl mx-auto transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * -40}px, ${mousePos.y * -40}px)` }}
+            style={{ transform: `translate(calc(var(--mx, 0) * -40)px, calc(var(--my, 0) * -40)px)` }}
           >
             <h2 className="font-display-xl text-headline-lg-mobile md:text-display-xl uppercase leading-none mb-6">
               NOT JUST <br/>
@@ -433,7 +440,7 @@ export default function Hero() {
             {/* Layer 1 (Deepest, Slowest) */}
             <div 
               className="absolute inset-0 opacity-30 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate(${mousePos.x * -2}px, ${mousePos.y * -2}px) translateY(${innerScrollY * 0.1}px)` }}
+              style={{ transform: `translate(calc(var(--mx, 0) * -2)px, calc(var(--my, 0) * -2)px) translateY(${innerScrollY * 0.1}px)` }}
             >
               <div className="absolute top-[10%] left-[15%] -rotate-12 scale-75"><MarioPipe /></div>
               <div className="absolute top-[35%] right-[25%] rotate-[25deg] scale-50"><MarioCoin /></div>
@@ -444,7 +451,7 @@ export default function Hero() {
             {/* Layer 2 (Middle Depth) */}
             <div 
               className="absolute inset-0 opacity-50 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate(${mousePos.x * -4}px, ${mousePos.y * -4}px) translateY(${innerScrollY * 0.25}px)` }}
+              style={{ transform: `translate(calc(var(--mx, 0) * -4)px, calc(var(--my, 0) * -4)px) translateY(${innerScrollY * 0.25}px)` }}
             >
               <div className="absolute top-[5%] left-[30%] rotate-6 scale-90"><MarioCoin /></div>
               <div className="absolute top-[45%] right-[8%] -rotate-[15deg] scale-100"><MarioPipe /></div>
@@ -455,7 +462,7 @@ export default function Hero() {
             {/* Layer 3 (Closest Background, Fastest) */}
             <div 
               className="absolute inset-0 opacity-80 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate(${mousePos.x * -7}px, ${mousePos.y * -7}px) translateY(${innerScrollY * 0.45}px)` }}
+              style={{ transform: `translate(calc(var(--mx, 0) * -7)px, calc(var(--my, 0) * -7)px) translateY(${innerScrollY * 0.45}px)` }}
             >
               <div className="absolute top-[15%] right-[15%] rotate-12 scale-110"><MarioQuestion /></div>
               <div className="absolute top-[28%] left-[5%] -rotate-12 scale-125"><MarioBrick /></div>
@@ -465,7 +472,7 @@ export default function Hero() {
           </div>
 
           <div className="relative z-20 w-full max-w-6xl mx-auto transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * -20}px, ${mousePos.y * -20}px) translateY(${innerScrollY}px)` }}>
+            style={{ transform: `translate(calc(var(--mx, 0) * -20)px, calc(var(--my, 0) * -20)px) translateY(${innerScrollY}px)` }}>
             
             <h2 className="font-display-xl text-headline-lg-mobile md:text-display-xl uppercase leading-none mb-2 text-center">
               HOW I <span className="bg-primary-container text-on-background px-4 py-1 inline-block -rotate-2 border-[4px] border-on-background shadow-[4px_4px_0_0_#1b1c15] md:shadow-[8px_8px_0_0_#1b1c15]">WORK</span>
