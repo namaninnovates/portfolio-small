@@ -3,6 +3,11 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
+import { SignJWT } from 'jose'
+
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-development-only'
+const key = new TextEncoder().encode(JWT_SECRET)
+
 export async function loginAction(prevState, formData) {
   const password = formData.get('password')
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin' // Fallback for local testing
@@ -12,8 +17,15 @@ export async function loginAction(prevState, formData) {
   }
 
   if (password === adminPassword) {
+    // Generate secure signed JWT
+    const token = await new SignJWT({ authenticated: true })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('7d')
+      .sign(key)
+
     const cookieStore = await cookies()
-    cookieStore.set('admin_session', 'authenticated', {
+    cookieStore.set('admin_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // 1 week

@@ -1,6 +1,11 @@
 import { NextResponse } from 'next/server'
 
-export function middleware(request) {
+import { jwtVerify } from 'jose'
+
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-development-only'
+const key = new TextEncoder().encode(JWT_SECRET)
+
+export async function middleware(request) {
   // Check if trying to access admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
     // Let login page through
@@ -10,12 +15,22 @@ export function middleware(request) {
 
     const authCookie = request.cookies.get('admin_session')
     
-    // Simple check: if cookie doesn't exist or isn't our expected value
-    // In a real app we'd verify a JWT, but for a simple personal portfolio
-    // this is a sufficient lightweight barrier.
-    if (!authCookie || authCookie.value !== 'authenticated') {
+    if (!authCookie) {
       const loginUrl = new URL('/admin/login', request.url)
       return NextResponse.redirect(loginUrl)
+    }
+
+    // Cryptographically verify the session token
+    try {
+      await jwtVerify(authCookie.value, key)
+      return NextResponse.next()
+    } catch (error) {
+      // Invalid token, signature mismatch, or expired
+      const loginUrl = new URL('/admin/login', request.url)
+      // Delete the invalid cookie
+      const response = NextResponse.redirect(loginUrl)
+      response.cookies.delete('admin_session')
+      return response
     }
   }
 

@@ -3,6 +3,13 @@ import "./globals.css";
 export const metadata = {
   title: "Naman Gupta's Portfolio",
   description: "Creative by design, editor by craft, dev by choice.",
+  openGraph: {
+    title: "Naman Gupta's Portfolio",
+    description: "Creative by design, editor by craft, dev by choice.",
+    url: "https://iamnamang.in",
+    siteName: "Naman Gupta's Portfolio",
+    type: "website",
+  }
 };
 
 import InteractiveBackground from "@/components/InteractiveBackground";
