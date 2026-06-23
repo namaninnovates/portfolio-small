@@ -64,14 +64,14 @@
   --spacing-unit: 4px;
   --spacing-margin-mobile: 16px;
 
-  --font-body-md: "Hanken Grotesk";
-  --font-headline-lg: "Anton";
-  --font-display-xl-mobile: "Anton";
-  --font-display-xl: "Anton";
-  --font-headline-lg-mobile: "Anton";
-  --font-body-lg: "Hanken Grotesk";
-  --font-label-mono: "Space Mono";
-  --font-headline-md: "Anton";
+  --font-body-md: var(--font-hanken);
+  --font-headline-lg: var(--font-anton);
+  --font-display-xl-mobile: var(--font-anton);
+  --font-display-xl: var(--font-anton);
+  --font-headline-lg-mobile: var(--font-anton);
+  --font-body-lg: var(--font-hanken);
+  --font-label-mono: var(--font-space-mono);
+  --font-headline-md: var(--font-anton);
 
   --text-body-md: 16px;
   --text-body-md--line-height: 24px;

@@ -1,10 +1,12 @@
 import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
-import Marquee from '@/components/Marquee'
-import Stats from '@/components/Stats'
-import Work from '@/components/Work'
-import Testimonials from '@/components/Testimonials'
-import Footer from '@/components/Footer'
+import nextDynamic from 'next/dynamic'
+
+const Marquee = nextDynamic(() => import('@/components/Marquee'))
+const Stats = nextDynamic(() => import('@/components/Stats'))
+const Work = nextDynamic(() => import('@/components/Work'))
+const Testimonials = nextDynamic(() => import('@/components/Testimonials'))
+const Footer = nextDynamic(() => import('@/components/Footer'))
 import { db } from '@/lib/db'
 import { works as worksSchema } from '@/db/schema'
 import { asc, desc } from 'drizzle-orm'
