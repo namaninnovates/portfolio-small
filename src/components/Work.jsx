@@ -75,17 +75,41 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                           className="w-full h-full object-contain transition-all duration-500 pointer-events-none" 
                           src={src} 
                           style={{ transform }}
-                          autoPlay 
                           muted 
                           loop 
                           playsInline 
-                          ref={(el) => { if (el) { el.defaultMuted = true; el.muted = true; el.play().catch(()=>{}); } }}
+                          preload="metadata"
+                          ref={(el) => { 
+                            if (el) { 
+                              el.defaultMuted = true; 
+                              el.muted = true; 
+                              // Lazy load and play only when in viewport
+                              if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+                                const observer = new IntersectionObserver(
+                                  (entries) => {
+                                    entries.forEach((entry) => {
+                                      if (entry.isIntersecting) {
+                                        el.play().catch(()=>{});
+                                      } else {
+                                        el.pause();
+                                      }
+                                    });
+                                  },
+                                  { rootMargin: '100px' }
+                                );
+                                observer.observe(el);
+                              } else {
+                                el.play().catch(()=>{});
+                              }
+                            } 
+                          }}
                         />
                       ) : (
                         <img 
                           className="w-full h-full object-contain transition-all duration-500 pointer-events-none" 
                           alt={work.title} 
                           src={src} 
+                          loading="lazy"
                           style={{ transform }}
                         />
                       )}

@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Naman Gupta Portfolio",
+  title: "Naman Gupta's Portfolio",
   description: "Creative by design, editor by craft, dev by choice.",
 };
 
