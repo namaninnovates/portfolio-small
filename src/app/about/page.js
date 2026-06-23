@@ -9,22 +9,22 @@ export const metadata = {
 
 const MinecraftPickaxe = () => {
   const pixels = [
-    "0000000000111110",
-    "0000000001333321",
-    "0000000013222221",
-    "0000000132211121",
-    "0000001322100121",
-    "0000013221014111",
-    "0000132110145100",
-    "0001321001451000",
-    "0013210014510000",
-    "0132100145100000",
-    "0121001451000000",
-    "0110014510000000",
+    "0000000111111000",
+    "0000001333332100",
+    "0000013222222100",
+    "0000132211112100",
+    "0001322100012100",
+    "0013221000001100",
+    "0132110001410000",
+    "1321000014510000",
+    "1210000145100000",
+    "1100001451000000",
+    "0000014510000000",
     "0000145100000000",
     "0001451000000000",
     "0014510000000000",
-    "0011100000000000",
+    "0145100000000000",
+    "1110000000000000",
   ];
   const colors = {
     '0': 'transparent',
@@ -54,6 +54,7 @@ export default function AboutPage() {
         
         {/* 1. Hero Header (Split Layout) */}
       <section className="px-margin-mobile md:px-margin-desktop pt-24 pb-20 md:pt-32 md:pb-32 border-b-8 border-on-background bg-surface-container-low relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-50 pointer-events-none z-0"></div>
         <div className="absolute top-10 right-10 w-64 h-64 bg-primary-container rounded-full mix-blend-multiply opacity-50 blur-3xl -z-10 animate-pulse"></div>
         <div className="absolute bottom-10 left-10 w-96 h-96 bg-secondary-container mix-blend-multiply opacity-40 blur-3xl -z-10"></div>
         
@@ -110,7 +111,7 @@ export default function AboutPage() {
           </div>
 
           {/* The Diamond Pickaxe */}
-          <div className="relative w-24 h-24 md:w-32 md:h-32 origin-bottom-left ml-[-15px] animate-[mine-swing_1.2s_infinite_ease-in-out] z-30 drop-shadow-[4px_4px_0_#000] md:drop-shadow-[8px_8px_0_#000]">
+          <div className="relative w-16 h-16 md:w-24 md:h-24 origin-bottom-left ml-[-10px] animate-[mine-swing_1.2s_infinite_ease-in-out] z-30 drop-shadow-[4px_4px_0_#000] md:drop-shadow-[8px_8px_0_#000]">
             <MinecraftPickaxe />
           </div>
         </div>
@@ -134,16 +135,16 @@ export default function AboutPage() {
           {/* Right Image Placeholder */}
           <div className="flex-1 w-full max-w-md relative group">
             <div className="absolute inset-0 bg-cobalt translate-x-4 translate-y-4 border-4 border-on-background"></div>
-            <div className="relative aspect-[3/4] bg-surface-variant border-4 border-on-background overflow-hidden flex items-center justify-center bg-dots bg-opacity-20 group-hover:-translate-y-2 group-hover:-translate-x-2 transition-transform duration-300">
-              {/* Replace with an actual <img> tag when you have a photo */}
-              <div className="text-center p-8">
-                <span className="material-symbols-outlined text-7xl text-on-background opacity-20 mb-4 block">person</span>
-                <span className="font-label-mono text-sm uppercase text-on-background opacity-50 block rotate-12">INSERT EPIC<br/>PHOTO HERE</span>
-              </div>
+            <div className="relative aspect-[3/4] bg-surface-variant border-4 border-on-background overflow-hidden flex items-center justify-center group-hover:-translate-y-2 group-hover:-translate-x-2 transition-transform duration-300">
+              <img 
+                src="/about-photo.jpg" 
+                alt="Naman" 
+                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+              />
             </div>
             {/* Decorative Brutalist Elements */}
             <div className="absolute -top-6 -right-6 w-16 h-16 bg-secondary text-on-secondary rounded-full border-4 border-on-background flex items-center justify-center animate-spin-slow neo-shadow">
-              <span className="font-label-mono text-[10px] uppercase text-center leading-tight">100%<br/>REAL</span>
+              <span className="font-label-mono text-[10px] uppercase text-center leading-tight">GRID<br/>BREAKER</span>
             </div>
           </div>
         </div>

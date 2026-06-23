@@ -146,8 +146,8 @@ export default function Navbar() {
     frame: 0, tick: 0,
   });
 
-  const tabCooldowns = useRef([false, false, false]);
-  const [tabBumps, setTabBumps] = useState([false, false, false]);
+  const tabCooldowns = useRef([false, false, false, false]);
+  const [tabBumps, setTabBumps] = useState([false, false, false, false]);
   const [coins, setCoins]       = useState([]);
   const [display, setDisplay]   = useState({ x: -50, y: 0, frame: 0, dir: 1 });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -280,6 +280,7 @@ export default function Navbar() {
   }, []);
 
   const NAV_LINKS = [
+    { label: 'Home', href: '/' },
     { label: 'Work', href: '/works' },
     { label: 'About', href: '/about' },
     { label: 'Contact', href: '/contact' }
@@ -296,7 +297,7 @@ export default function Navbar() {
 
       {/* Mobile Menu Popup */}
       {isMobileMenuOpen && (
-        <div className="absolute top-[80px] right-4 z-40 bg-background border-4 border-on-background neo-shadow p-6 flex flex-col items-stretch gap-4 md:hidden w-64">
+        <div className="fixed top-[80px] right-4 z-50 bg-background border-4 border-on-background neo-shadow p-6 flex flex-col items-stretch gap-4 md:hidden w-64">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.label}
@@ -308,7 +309,7 @@ export default function Navbar() {
             </Link>
           ))}
           <button 
-            className="mt-2 bg-secondary text-on-secondary border-4 border-on-background px-6 py-3 font-headline-md text-2xl uppercase neo-shadow transition-all duration-150 -rotate-2 text-center"
+            className="mt-2 bg-secondary-container text-on-secondary-container border-4 border-on-background px-6 py-3 font-headline-md text-2xl uppercase neo-shadow transition-all duration-150 -rotate-2 text-center"
             onClick={() => { setIsMobileMenuOpen(false); setIsHireMeOpen(true); }}
           >
             Hire Me
@@ -390,7 +391,7 @@ export default function Navbar() {
             {/* ── Hire Me ─────────────────────────────────── */}
             <button 
               onClick={() => setIsHireMeOpen(true)}
-              className="hidden md:block bg-primary-container text-on-background border-4 border-on-background px-6 py-2 font-label-mono text-label-mono uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2"
+              className="hidden md:block bg-secondary-container text-on-secondary-container border-4 border-on-background px-6 py-2 font-label-mono text-label-mono uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2"
             >
               Hire Me
             </button>

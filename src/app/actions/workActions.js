@@ -93,3 +93,21 @@ export async function deleteWork(id) {
     return { error: 'Failed to delete work' }
   }
 }
+
+export async function updateWorksOrder(orderedIds) {
+  try {
+    for (let i = 0; i < orderedIds.length; i++) {
+      await prisma.work.update({
+        where: { id: orderedIds[i] },
+        data: { order: i }
+      })
+    }
+    revalidatePath('/')
+    revalidatePath('/works')
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (error) {
+    console.error('Failed to update order:', error)
+    return { error: 'Failed to update order' }
+  }
+}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Script from 'next/script'
-import { createWork, updateWork, deleteWork, getCloudinarySignature } from '@/app/actions/workActions'
+import { createWork, updateWork, deleteWork, getCloudinarySignature, updateWorksOrder } from '@/app/actions/workActions'
 import { logoutAction } from '@/app/actions/authActions'
 import { deleteEnquiry } from '@/app/actions/enquiryActions'
 
@@ -206,6 +206,26 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
       await deleteEnquiry(id)
       window.location.reload()
     }
+  }
+
+  const handleMoveUp = async (index) => {
+    if (index === 0) return;
+    const newWorks = [...works];
+    const temp = newWorks[index - 1];
+    newWorks[index - 1] = newWorks[index];
+    newWorks[index] = temp;
+    setWorks(newWorks);
+    await updateWorksOrder(newWorks.map(w => w.id));
+  }
+
+  const handleMoveDown = async (index) => {
+    if (index === works.length - 1) return;
+    const newWorks = [...works];
+    const temp = newWorks[index + 1];
+    newWorks[index + 1] = newWorks[index];
+    newWorks[index] = temp;
+    setWorks(newWorks);
+    await updateWorksOrder(newWorks.map(w => w.id));
   }
 
   const handleLogout = async () => {
@@ -522,8 +542,8 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
                   No works added yet. Use the form to add your first portfolio item.
                 </p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {works.map(work => {
+                <div className="grid grid-cols-1 gap-4">
+                  {works.map((work, index) => {
                     const urlParts = work.imageUrl.split('#pos=');
                     const src = urlParts[0];
                     const [posX, posY, scale] = urlParts[1] ? urlParts[1].split(',') : ['50', '50', '100'];
@@ -548,15 +568,33 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
                           <p className="font-body-md text-xs line-clamp-2 mb-2">{work.description}</p>
                         </div>
                         <div className="flex gap-2">
+                          <div className="flex flex-col gap-1 mr-2 border-r-2 border-on-background pr-2">
+                            <button 
+                              onClick={() => handleMoveUp(index)}
+                              disabled={index === 0}
+                              className="bg-surface-variant text-on-surface-variant border-2 border-on-background px-1 py-0.5 hover:bg-cobalt hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-surface-variant disabled:hover:text-on-surface-variant flex items-center justify-center"
+                              title="Move Up"
+                            >
+                              <span className="material-symbols-outlined text-sm">arrow_upward</span>
+                            </button>
+                            <button 
+                              onClick={() => handleMoveDown(index)}
+                              disabled={index === works.length - 1}
+                              className="bg-surface-variant text-on-surface-variant border-2 border-on-background px-1 py-0.5 hover:bg-cobalt hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-surface-variant disabled:hover:text-on-surface-variant flex items-center justify-center"
+                              title="Move Down"
+                            >
+                              <span className="material-symbols-outlined text-sm">arrow_downward</span>
+                            </button>
+                          </div>
                           <button 
                             onClick={() => { setEditingWork(work); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                            className="bg-primary-container text-on-background border-2 border-on-background px-2 py-1 font-label-mono text-xs uppercase hover:bg-cobalt hover:text-white transition-colors"
+                            className="bg-primary-container text-on-background border-2 border-on-background px-4 py-2 font-label-mono text-xs uppercase hover:bg-cobalt hover:text-white transition-colors"
                           >
                             Edit
                           </button>
                           <button 
                             onClick={() => handleDelete(work.id)}
-                            className="bg-error text-white border-2 border-on-background px-2 py-1 font-label-mono text-xs uppercase hover:bg-red-700 transition-colors"
+                            className="bg-error text-white border-2 border-on-background px-4 py-2 font-label-mono text-xs uppercase hover:bg-red-700 transition-colors"
                           >
                             Delete
                           </button>

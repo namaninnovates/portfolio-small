@@ -7,14 +7,14 @@ export const dynamic = 'force-dynamic'
 
 export default async function WorksPage() {
   const works = await prisma.work.findMany({
-    orderBy: { createdAt: 'desc' }
+    orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
   })
 
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
       <div className="pt-20">
-        <Work works={works} title="ALL" showViewAll={false} />
+        <Work works={works} title="ALL" showViewAll={false} enableVideoPopup={true} variant="dark" />
       </div>
       <Footer />
     </main>

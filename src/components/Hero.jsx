@@ -48,6 +48,7 @@ const MarioQuestion = () => (
 export default function Hero() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [cursorPx, setCursorPx] = useState({ x: -1000, y: -1000 });
   const [windowHeight, setWindowHeight] = useState(1000);
   const [isBulbHit, setIsBulbHit] = useState(false);
   const heroRef = useRef(null);
@@ -79,6 +80,7 @@ export default function Hero() {
       const x = (e.clientX / window.innerWidth - 0.5) * 2;
       const y = (e.clientY / window.innerHeight - 0.5) * 2;
       setMousePos({ x, y });
+      setCursorPx({ x: e.clientX, y: e.clientY });
     };
 
     let lastGyroTime = 0;
@@ -152,7 +154,17 @@ export default function Hero() {
     <section ref={heroRef} className="relative h-[600vh] w-full">
       {/* perspective-origin on the sticky viewport gives the cylinder its vanishing point */}
       <div className="sticky top-[90px] md:top-[110px] h-[calc(100vh-90px)] md:h-[calc(100vh-110px)] w-full overflow-hidden" style={{ overflow: 'clip' }}>
-        
+        <div className="absolute inset-0 bg-grid-pattern opacity-50 pointer-events-none z-0"></div>
+        {/* Warpy Grid Layer tracking the mouse */}
+        <div 
+          className="absolute inset-0 bg-grid-pattern opacity-100 pointer-events-none z-0"
+          style={{
+            backgroundSize: '80px 80px',
+            backgroundPosition: `-${mousePos.x * 20}px -${mousePos.y * 20}px`,
+            WebkitMaskImage: `radial-gradient(circle 250px at ${cursorPx.x}px ${cursorPx.y}px, black 30%, transparent 100%)`,
+            maskImage: `radial-gradient(circle 250px at ${cursorPx.x}px ${cursorPx.y}px, black 30%, transparent 100%)`,
+          }}
+        ></div>
         {/* --- BLOCK 1: INTRO --- */}
         <div 
           className="absolute inset-0 flex flex-col justify-center px-margin-mobile md:px-margin-desktop"

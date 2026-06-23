@@ -1,3 +1,7 @@
+"use client";
+import React, { useState } from 'react';
+import Link from 'next/link';
+
 const getToolColor = (toolName) => {
   const t = toolName.trim().toLowerCase();
   if (t.includes('react')) return { bg: '#61dafb', text: '#000' };
@@ -26,27 +30,33 @@ const getToolColor = (toolName) => {
   return colors[Math.abs(hash) % colors.length];
 };
 
-import Link from 'next/link';
+export default function Work({ works = [], title = "SELECTED", showViewAll = false, enableVideoPopup = false, variant = "light" }) {
+  const [activeVideo, setActiveVideo] = useState(null);
 
-export default function Work({ works = [], title = "SELECTED", showViewAll = false }) {
-  // If no works passed, we can show a placeholder or empty state
-  // But ideally the DB has the works
   return (
-    <section className="px-margin-mobile md:px-margin-desktop pt-16 pb-48 bg-surface-container-low relative z-20 border-t-4 border-on-background" id="work">
-      <div className="flex items-end justify-between mb-16 border-b-8 border-on-background pb-4 relative">
-        <h2 className="font-display-xl text-headline-lg-mobile md:text-headline-lg uppercase flex items-center gap-4">{title} <span className="bg-primary-container px-2 border-4 border-on-background -rotate-2 inline-block">WORK</span><span className="material-symbols-outlined text-cobalt text-5xl rotate-90 hidden md:block">south</span></h2>
-        <div className="hidden md:block absolute -right-10 -bottom-10 w-24 h-24 bg-dots rounded-full border-4 border-on-background flex items-center justify-center"><span className="material-symbols-outlined text-4xl animate-bounce">arrow_downward</span></div>
+    <section className={`px-margin-mobile md:px-margin-desktop pt-16 pb-48 relative z-20 border-t-4 border-on-background ${variant === 'dark' ? 'bg-on-background bg-grid-pattern-primary' : 'bg-surface-container-low'}`} id="work">
+      {/* CSS to hide Safari/Chrome default large play button on blocked autoplays */}
+      <style dangerouslySetInnerHTML={{__html: `
+        video::-webkit-media-controls-start-playback-button,
+        video::-webkit-media-controls-play-button,
+        video::-webkit-media-controls {
+          display: none !important;
+          -webkit-appearance: none;
+        }
+      `}} />
+      <div className={`flex items-end justify-between mb-16 border-b-8 pb-4 relative ${variant === 'dark' ? 'border-background' : 'border-on-background'}`}>
+        <h2 className={`font-display-xl text-headline-lg-mobile md:text-headline-lg uppercase flex items-center gap-4 ${variant === 'dark' ? 'text-background' : 'text-on-background'}`}>{title} <span className={`bg-primary-container text-on-background px-2 border-4 -rotate-2 inline-block ${variant === 'dark' ? 'border-background' : 'border-on-background'}`}>WORK</span><span className="material-symbols-outlined text-cobalt text-5xl rotate-90 hidden md:block">south</span></h2>
+        <div className={`hidden md:block absolute -right-10 -bottom-10 w-24 h-24 rounded-full border-4 flex items-center justify-center ${variant === 'dark' ? 'bg-primary-container text-on-background border-background' : 'bg-dots border-on-background'}`}><span className="material-symbols-outlined text-4xl animate-bounce">arrow_downward</span></div>
       </div>
       <div className="max-w-[1300px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 pt-10">
         {works.map((work, index) => {
-          // Dynamic rotation based on index to keep the neobrutalist staggered look
           const rotations = ['-rotate-2', 'rotate-3', '-rotate-1', 'rotate-2', '-rotate-3']
           const rotationClass = rotations[index % rotations.length]
           
           return (
-            <article key={work.id} className={`bg-background border-4 border-on-background neo-shadow neo-shadow-blue hover:-translate-y-2 transition-all duration-300 ${rotationClass} hover:rotate-0 flex flex-col group relative z-10 hover:z-20 ${index % 2 !== 0 ? 'md:mt-8' : ''}`}>
-              <div className={`aspect-square border-b-4 border-on-background overflow-hidden relative bg-surface-variant p-4`}>
+            <article key={work.id} className={`bg-background bg-dots border-4 border-on-background neo-shadow neo-shadow-blue hover:-translate-y-2 transition-all duration-300 ${rotationClass} hover:rotate-0 flex flex-col group relative z-10 hover:z-20 ${index % 2 !== 0 ? 'md:mt-8' : ''}`}>
+              <div className={`aspect-square border-b-4 border-on-background overflow-hidden relative p-4`}>
                 {(() => {
                   const urlParts = work.imageUrl.split('#pos=');
                   const src = urlParts[0];
@@ -59,17 +69,21 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                   const transform = `scale(${S}) translate(${shiftX}%, ${shiftY}%)`;
                   
                   return (
-                    <div className="w-full h-full border-2 border-on-background overflow-hidden relative bg-surface-variant flex items-center justify-center">
+                    <div className="w-full h-full border-2 border-on-background overflow-hidden relative flex items-center justify-center bg-background">
                       {work.mediaType === 'video' ? (
                         <video 
-                          className="w-full h-full object-contain transition-all duration-500" 
+                          className="w-full h-full object-contain transition-all duration-500 pointer-events-none" 
                           src={src} 
                           style={{ transform }}
-                          autoPlay muted loop playsInline 
+                          autoPlay 
+                          muted 
+                          loop 
+                          playsInline 
+                          ref={(el) => { if (el) { el.defaultMuted = true; el.muted = true; el.play().catch(()=>{}); } }}
                         />
                       ) : (
                         <img 
-                          className="w-full h-full object-contain transition-all duration-500" 
+                          className="w-full h-full object-contain transition-all duration-500 pointer-events-none" 
                           alt={work.title} 
                           src={src} 
                           style={{ transform }}
@@ -84,11 +98,11 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                   </div>
                 )}
               </div>
-              <div className="p-3 flex flex-col bg-dots bg-opacity-10">
+              <div className="p-3 flex flex-col bg-transparent">
                 <h3 className="font-headline-md text-lg uppercase mb-1 group-hover:text-cobalt transition-colors line-clamp-1">{work.title}</h3>
                 <p className="font-body-md text-xs mb-2 line-clamp-2">{work.description}</p>
                 <div className="mt-auto flex justify-between items-center border-t-2 border-on-background pt-2 border-dashed">
-                  <div className="flex gap-1.5 flex-wrap max-w-[75%]">
+                  <div className="flex gap-1.5 flex-wrap max-w-[70%]">
                     {work.tools.split(',').slice(0, 3).map((tool, i) => {
                       const color = getToolColor(tool);
                       return (
@@ -101,11 +115,22 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                        <span className="text-[9px] font-label-mono text-on-surface-variant flex items-center">+{work.tools.split(',').length - 3}</span>
                     )}
                   </div>
-                  {(work.projectUrl || work.liveUrl) && (
-                    <a href={work.projectUrl || work.liveUrl} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-on-background text-background flex items-center justify-center rounded-none hover:bg-cobalt hover:text-on-primary border-2 border-transparent hover:border-on-background transition-colors text-xl shrink-0">
-                      <span className="material-symbols-outlined text-2xl">north_east</span>
-                    </a>
-                  )}
+                  <div className="flex gap-1">
+                    {(enableVideoPopup && work.mediaType === 'video') && (
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); setActiveVideo(work.imageUrl.split('#pos=')[0]); }}
+                        className="w-9 h-9 bg-primary-container text-on-background flex items-center justify-center border-2 border-on-background hover:bg-cobalt hover:text-white transition-colors"
+                        title="Play Video"
+                      >
+                        <span className="material-symbols-outlined text-xl">play_arrow</span>
+                      </button>
+                    )}
+                    {(work.projectUrl || work.liveUrl) && (
+                      <a href={work.projectUrl || work.liveUrl} target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-on-background text-background flex items-center justify-center border-2 border-on-background hover:bg-cobalt hover:text-white transition-colors" onClick={(e) => e.stopPropagation()}>
+                        <span className="material-symbols-outlined text-xl">north_east</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </article>
@@ -121,6 +146,45 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
           </div>
         )}
       </div>
+
+      {/* Video Popup Modal */}
+      {activeVideo && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setActiveVideo(null)}
+        >
+          <div 
+            className="bg-background border-4 border-on-background neo-shadow w-fit relative cursor-default flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Mac-style Modal Header */}
+            <div className="border-b-4 border-on-background px-4 py-3 flex justify-between items-center bg-primary-container shrink-0 w-full">
+              <div className="flex gap-2 mr-8">
+                <div className="w-3.5 h-3.5 rounded-full bg-error border-2 border-on-background"></div>
+                <div className="w-3.5 h-3.5 rounded-full bg-surface-variant border-2 border-on-background"></div>
+                <div className="w-3.5 h-3.5 rounded-full bg-cobalt border-2 border-on-background"></div>
+              </div>
+              <button 
+                onClick={() => setActiveVideo(null)}
+                className="w-8 h-8 bg-error border-2 border-on-background flex items-center justify-center hover:scale-110 transition-transform neo-shadow shrink-0"
+              >
+                <span className="material-symbols-outlined text-on-background text-sm font-bold">close</span>
+              </button>
+            </div>
+            
+            {/* Modal Video Player */}
+            <div className="bg-background flex items-center justify-center overflow-hidden">
+              <video 
+                src={activeVideo} 
+                controls 
+                autoPlay 
+                style={{ maxHeight: '55vh', maxWidth: '80vw' }}
+                className="w-auto h-auto object-contain block"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

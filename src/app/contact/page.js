@@ -33,7 +33,7 @@ export default function ContactPage() {
             </div>
             <h1 className="font-display-xl text-5xl md:text-8xl uppercase leading-none tracking-tighter text-white drop-shadow-[4px_4px_0_var(--color-on-background)] md:drop-shadow-[6px_6px_0_var(--color-on-background)]">
               LET&apos;S BUILD <br className="hidden md:block" />
-              SOMETHING <span className="text-primary-container underline decoration-8 underline-offset-4">LOUD.</span>
+              SOMETHING <span className="text-primary-container">LOUD.</span>
             </h1>
           </div>
           <div className="hidden md:block w-32 h-32 bg-primary-container border-8 border-on-background rounded-full animate-spin-slow flex items-center justify-center neo-shadow text-on-background">
