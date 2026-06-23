@@ -1,5 +1,5 @@
 export default function robots() {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://namangupta.vercel.app' // Update this to your actual production domain
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.iamnamang.in'
 
   return {
     rules: {
