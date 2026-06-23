@@ -38,6 +38,8 @@ const spaceMono = Space_Mono({
   display: 'swap',
 })
 
+import LenisProvider from "@/components/LenisProvider";
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`light ${anton.variable} ${hankenGrotesk.variable} ${spaceMono.variable}`} style={{ overflowX: 'clip' }}>
@@ -60,8 +62,10 @@ export default function RootLayout({ children }) {
             document.head.appendChild(link);
           `}
         </Script>
-        <InteractiveBackground />
-        {children}
+        <LenisProvider>
+          <InteractiveBackground />
+          {children}
+        </LenisProvider>
         <Analytics />
       </body>
     </html>
