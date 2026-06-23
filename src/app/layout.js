@@ -6,6 +6,7 @@ export const metadata = {
 };
 
 import InteractiveBackground from "@/components/InteractiveBackground";
+import { Analytics } from "@vercel/analytics/react";
 
 export default function RootLayout({ children }) {
   return (
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
       <body className="text-on-background font-body-md w-full selection:bg-primary-container selection:text-on-background cursor-none" style={{ overflowX: 'clip' }}>
         <InteractiveBackground />
         {children}
+        <Analytics />
       </body>
     </html>
   );
