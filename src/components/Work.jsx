@@ -73,12 +73,12 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                       {work.mediaType === 'video' ? (
                         <video 
                           className="w-full h-full object-contain transition-all duration-500 pointer-events-none" 
-                          src={src} 
+                          data-src={src} 
                           style={{ transform }}
                           muted 
                           loop 
                           playsInline 
-                          preload="metadata"
+                          preload="none"
                           ref={(el) => { 
                             if (el) { 
                               el.defaultMuted = true; 
@@ -89,6 +89,9 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                                   (entries) => {
                                     entries.forEach((entry) => {
                                       if (entry.isIntersecting) {
+                                        if (!el.getAttribute('src')) {
+                                          el.setAttribute('src', el.getAttribute('data-src'));
+                                        }
                                         el.play().catch(()=>{});
                                       } else {
                                         el.pause();
@@ -99,6 +102,9 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                                 );
                                 observer.observe(el);
                               } else {
+                                if (!el.getAttribute('src')) {
+                                  el.setAttribute('src', el.getAttribute('data-src'));
+                                }
                                 el.play().catch(()=>{});
                               }
                             } 
