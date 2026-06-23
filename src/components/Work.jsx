@@ -26,13 +26,15 @@ const getToolColor = (toolName) => {
   return colors[Math.abs(hash) % colors.length];
 };
 
-export default function Work({ works = [] }) {
+import Link from 'next/link';
+
+export default function Work({ works = [], title = "SELECTED", showViewAll = false }) {
   // If no works passed, we can show a placeholder or empty state
   // But ideally the DB has the works
   return (
     <section className="px-margin-mobile md:px-margin-desktop pt-16 pb-48 bg-surface-container-low relative z-20 border-t-4 border-on-background" id="work">
       <div className="flex items-end justify-between mb-16 border-b-8 border-on-background pb-4 relative">
-        <h2 className="font-display-xl text-headline-lg-mobile md:text-headline-lg uppercase flex items-center gap-4">SELECTED <span className="bg-primary-container px-2 border-4 border-on-background -rotate-2 inline-block">WORK</span><span className="material-symbols-outlined text-cobalt text-5xl rotate-90 hidden md:block">south</span></h2>
+        <h2 className="font-display-xl text-headline-lg-mobile md:text-headline-lg uppercase flex items-center gap-4">{title} <span className="bg-primary-container px-2 border-4 border-on-background -rotate-2 inline-block">WORK</span><span className="material-symbols-outlined text-cobalt text-5xl rotate-90 hidden md:block">south</span></h2>
         <div className="hidden md:block absolute -right-10 -bottom-10 w-24 h-24 bg-dots rounded-full border-4 border-on-background flex items-center justify-center"><span className="material-symbols-outlined text-4xl animate-bounce">arrow_downward</span></div>
       </div>
       <div className="max-w-[1300px] mx-auto">
@@ -110,6 +112,14 @@ export default function Work({ works = [] }) {
           )
         })}
         </div>
+        
+        {showViewAll && works.length > 0 && (
+          <div className="mt-20 flex justify-center w-full">
+            <Link href="/works" className="bg-primary-container border-4 border-on-background neo-shadow neo-shadow-blue hover:-translate-y-1 hover:translate-x-1 hover:shadow-none transition-all px-10 py-5 font-headline-md text-2xl uppercase flex items-center gap-3 group relative z-20">
+              View All Works <span className="material-symbols-outlined text-3xl group-hover:translate-x-2 transition-transform">arrow_forward</span>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

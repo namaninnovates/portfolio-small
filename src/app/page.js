@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   const works = await prisma.work.findMany({
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    take: 12
   })
 
   return (
@@ -19,7 +20,7 @@ export default async function Home() {
       <Hero />
       <Marquee />
       <Stats />
-      <Work works={works} />
+      <Work works={works} title="SELECTED" showViewAll={true} />
       <Footer />
     </>
   )

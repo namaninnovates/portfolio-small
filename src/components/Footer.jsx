@@ -157,11 +157,14 @@ export default function Footer() {
       
       <div className="flex flex-col md:flex-row justify-between items-center w-full p-margin-mobile md:p-margin-desktop gap-gutter relative z-10">
         <div className="flex flex-col items-center md:items-start w-full md:w-1/2">
-          <h2 className="font-display-xl text-headline-lg-mobile md:text-headline-lg uppercase mb-4 text-center md:text-left drop-shadow-[4px_4px_0_#1b1c15]">LET&apos;S BUILD SOMETHING</h2>
+          <h2 className="font-display-xl text-headline-lg-mobile md:text-headline-lg uppercase mb-4 text-center md:text-left drop-shadow-[4px_4px_0_#1b1c15]">LET&apos;S BREAK THE ALGORITHM</h2>
           <p className="font-body-lg text-body-lg mb-8 max-w-md text-center md:text-left">Ready to break the grid? Drop a line and let&apos;s get weird.</p>
-          <a className="bg-primary-container text-on-background border-4 border-on-background px-8 py-4 font-headline-md text-headline-md uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-1 inline-block" href="mailto:naman.innovates@gmail.com">
+          <button 
+            className="bg-primary-container text-on-background border-4 border-on-background px-8 py-4 font-headline-md text-headline-md uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-1 inline-block cursor-pointer" 
+            onClick={() => window.dispatchEvent(new CustomEvent('open-hire-me'))}
+          >
             START A PROJECT
-          </a>
+          </button>
         </div>
         <div className="flex flex-col items-center md:items-end gap-12 w-full md:w-1/2 mt-12 mb-32 md:mb-0 md:mt-0">
           <div className="flex gap-6 flex-wrap justify-center">

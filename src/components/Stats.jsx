@@ -44,12 +44,12 @@ export default function Stats() {
     <section className="w-full bg-background py-16 px-margin-mobile md:px-margin-desktop border-b-4 border-on-background relative z-20">
       <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-8 perspective-[2000px]">
         <PhysicsCard baseRotate={-3} bgClass="bg-primary-container">
-          <span className="block text-4xl mb-2 drop-shadow-[2px_2px_0_rgba(27,28,21,0.2)]">15+</span>
+          <span className="block text-4xl mb-2 drop-shadow-[2px_2px_0_rgba(27,28,21,0.2)]">100+</span>
           <span className="text-xl drop-shadow-[2px_2px_0_rgba(27,28,21,0.2)]">PROJECTS SHIPPED</span>
         </PhysicsCard>
         
         <PhysicsCard baseRotate={2} bgClass="bg-secondary-container" textClass="text-on-secondary">
-          <span className="block text-4xl mb-2 drop-shadow-[2px_2px_0_rgba(27,28,21,0.5)]">3+</span>
+          <span className="block text-4xl mb-2 drop-shadow-[2px_2px_0_rgba(27,28,21,0.5)]">6+</span>
           <span className="text-xl drop-shadow-[2px_2px_0_rgba(27,28,21,0.5)]">YEARS</span>
         </PhysicsCard>
         
@@ -60,7 +60,7 @@ export default function Stats() {
         
         <PhysicsCard baseRotate={3} bgClass="bg-primary-container">
           <span className="block text-4xl mb-2 drop-shadow-[2px_2px_0_rgba(27,28,21,0.2)]">100%</span>
-          <span className="text-xl drop-shadow-[2px_2px_0_rgba(27,28,21,0.2)]">PUNCHY</span>
+          <span className="text-xl drop-shadow-[2px_2px_0_rgba(27,28,21,0.2)]">RELENTLESS</span>
         </PhysicsCard>
       </div>
     </section>

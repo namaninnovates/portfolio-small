@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import HireMeModal from "@/components/HireMeModal";
 
 // ═══════════════════════════════════════
@@ -158,6 +159,12 @@ export default function Navbar() {
   const removeCoin = (id) => setCoins(prev => prev.filter(c => c.id !== id));
 
   useEffect(() => {
+    const handleOpenHireMe = () => setIsHireMeOpen(true);
+    window.addEventListener('open-hire-me', handleOpenHireMe);
+    return () => window.removeEventListener('open-hire-me', handleOpenHireMe);
+  }, []);
+
+  useEffect(() => {
     const s = phys.current;
     const GRAVITY   = 0.72;
     const JUMP_TAB  = -7.5;  // small realistic hop to head-butt a tab
@@ -272,7 +279,11 @@ export default function Navbar() {
     return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
-  const NAV_LINKS = ['Work', 'About', 'Contact'];
+  const NAV_LINKS = [
+    { label: 'Work', href: '/works' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' }
+  ];
   return (
     <>
       <style>{`
@@ -286,15 +297,15 @@ export default function Navbar() {
       {/* Mobile Menu Popup */}
       {isMobileMenuOpen && (
         <div className="absolute top-[80px] right-4 z-40 bg-background border-4 border-on-background neo-shadow p-6 flex flex-col items-stretch gap-4 md:hidden w-64">
-          {NAV_LINKS.map((label) => (
-            <a
-              key={label}
-              href={`#${label.toLowerCase()}`}
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
               onClick={() => setIsMobileMenuOpen(false)}
               className="text-on-background font-display-xl text-3xl hover:text-cobalt transition-all duration-150 uppercase bg-primary-container px-6 py-2 border-4 border-on-background neo-shadow text-center rotate-1"
             >
-              {label}
-            </a>
+              {link.label}
+            </Link>
           ))}
           <button 
             className="mt-2 bg-secondary text-on-secondary border-4 border-on-background px-6 py-3 font-headline-md text-2xl uppercase neo-shadow transition-all duration-150 -rotate-2 text-center"
@@ -335,17 +346,18 @@ export default function Navbar() {
           </div>
 
           {/* ── Logo ────────────────────────────────────── */}
-          <a
-            className="font-display-xl-mobile text-2xl md:text-display-xl-mobile text-on-background -rotate-3 hover:rotate-0 transition-transform z-30 relative pb-1"
-            href="#"
+          <Link
+            href="/"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="font-display-xl text-4xl md:text-5xl tracking-tighter -rotate-3 hover:rotate-0 hover:scale-105 transition-transform origin-left z-30 relative pb-2"
           >
             IAM<span className="text-secondary-container">NAMAN</span>G
-          </a>
+          </Link>
 
           {/* ── Nav links (hit blocks) ──────────────────── */}
           <div className="hidden md:flex items-end gap-16 z-30 relative pb-3">
-            {NAV_LINKS.map((label, i) => (
-              <div key={label} className="relative flex flex-col items-center">
+            {NAV_LINKS.map((link, i) => (
+              <div key={link.label} className="relative flex flex-col items-center">
                 {/* Coins pop out above their specific tab */}
                 {coins.map(coin => {
                   if (!navRef.current || !linkRefs.current[i]) return null;
@@ -358,9 +370,9 @@ export default function Navbar() {
                   );
                 })}
 
-                <a
+                <Link
                   ref={el => linkRefs.current[i] = el}
-                  href={`#${label.toLowerCase()}`}
+                  href={link.href}
                   className="text-on-background font-label-mono text-label-mono hover:scale-110 hover:-rotate-2 transition-colors duration-150 pb-1"
                   style={{
                     display: 'inline-block',
@@ -368,8 +380,8 @@ export default function Navbar() {
                     transition: 'transform 0.1s ease-out',
                   }}
                 >
-                  {label}
-                </a>
+                  {link.label}
+                </Link>
               </div>
             ))}
           </div>

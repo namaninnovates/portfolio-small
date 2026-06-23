@@ -68,8 +68,8 @@ export default function Hero() {
       const rect = heroRef.current.getBoundingClientRect();
       let progress = 0;
       if (rect.top <= 0) {
-        // max progress is 4 for a 500vh container (1 per 100vh scrolling)
-        progress = Math.max(0, Math.min(5, -rect.top / window.innerHeight));
+        // max progress is 6 for a 600vh container (1 per 100vh scrolling)
+        progress = Math.max(0, Math.min(6, -rect.top / window.innerHeight));
       }
       setScrollProgress(progress);
     };
@@ -145,13 +145,13 @@ export default function Hero() {
   // Roadmap scroll: starts at 2.3, runs until 4.0
   const roadmapProgress = Math.max(0, Math.min(1, (scrollProgress - 2.3) / 1.7));
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const maxScroll = isMobile ? 550 : 250;
+  const maxScroll = isMobile ? 650 : 500;
   const innerScrollY = -roadmapProgress * maxScroll;
 
   return (
-    <section ref={heroRef} className="relative h-[500vh] w-full">
+    <section ref={heroRef} className="relative h-[600vh] w-full">
       {/* perspective-origin on the sticky viewport gives the cylinder its vanishing point */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden" style={{ overflow: 'clip' }}>
+      <div className="sticky top-[90px] md:top-[110px] h-[calc(100vh-90px)] md:h-[calc(100vh-110px)] w-full overflow-hidden" style={{ overflow: 'clip' }}>
         
         {/* --- BLOCK 1: INTRO --- */}
         <div 
@@ -167,11 +167,11 @@ export default function Hero() {
           {/* Background Elements */}
           <div 
             className="absolute top-20 right-10 md:right-32 w-32 h-32 bg-primary-container border-4 border-on-background rounded-full mix-blend-multiply opacity-50 blur-3xl animate-pulse transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * 40}px, ${mousePos.y * 40}px)` }}
+            style={{ transform: `translate(${mousePos.x * 40}px, ${mousePos.y * 40 + scrollProgress * 200}px)` }}
           ></div>
           <div 
             className="absolute bottom-20 left-10 md:left-32 w-48 h-48 bg-secondary-container border-4 border-on-background mix-blend-multiply opacity-40 blur-2xl animate-pulse delay-1000 transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * 60}px, ${mousePos.y * 60}px)` }}
+            style={{ transform: `translate(${mousePos.x * 60}px, ${mousePos.y * 60 + scrollProgress * 150}px)` }}
           ></div>
           
           {/* Experience Ribbon */}
@@ -195,7 +195,7 @@ export default function Hero() {
 
           {/* Main Content */}
           <div 
-            className="relative z-20 max-w-5xl mx-auto text-center md:text-left transition-transform duration-200 ease-out"
+            className="relative z-20 max-w-5xl mx-auto text-center md:text-left transition-transform duration-200 ease-out mt-12 md:mt-24"
             style={{ transform: `translate(${mousePos.x * -30}px, ${mousePos.y * -30}px)` }}
           >
             <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-[1.1] md:leading-none mb-4 md:mb-8 tracking-tighter">
@@ -224,7 +224,7 @@ export default function Hero() {
           {/* Tool Chips Scattered */}
           <div 
             className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-[400ms] md:duration-200 ease-out opacity-60 md:opacity-100 scale-75 md:scale-100"
-            style={{ transform: `translate(${mousePos.x * 50}px, ${mousePos.y * 50}px)` }}
+            style={{ transform: `translate(${mousePos.x * 50}px, ${mousePos.y * 50 + scrollProgress * 120}px)` }}
           >
             <span className="absolute top-[8%] md:top-[20%] left-[5%] md:left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">data_object</span>JavaScript</span>
             <span className="absolute top-[18%] md:top-[30%] right-[5%] md:right-[25%] bg-surface-container-high border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">science</span>React</span>
@@ -252,11 +252,11 @@ export default function Hero() {
           {/* New Background Elements */}
           <div 
             className="absolute top-1/4 left-1/4 w-64 h-64 bg-cobalt border-4 border-on-background rounded-full mix-blend-multiply opacity-30 blur-3xl animate-pulse transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * 60}px, ${mousePos.y * 60}px)` }}
+            style={{ transform: `translate(${mousePos.x * 60}px, ${mousePos.y * 60 + scrollProgress * 180}px)` }}
           ></div>
           <div 
             className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-container border-4 border-on-background mix-blend-multiply opacity-20 blur-3xl animate-pulse delay-700 transition-transform duration-200 ease-out"
-            style={{ transform: `translate(${mousePos.x * -60}px, ${mousePos.y * -60}px)` }}
+            style={{ transform: `translate(${mousePos.x * -60}px, ${mousePos.y * -60 + scrollProgress * 130}px)` }}
           ></div>
 
           {/* Swinging Lightbulb */}
@@ -290,7 +290,7 @@ export default function Hero() {
           {/* Floating Impact Words */}
           <div 
             className="absolute inset-0 pointer-events-none transition-transform duration-200 ease-out opacity-30 md:opacity-100 scale-75 md:scale-100"
-            style={{ transform: `translate(${mousePos.x * 80}px, ${mousePos.y * 80}px)` }}
+            style={{ transform: `translate(${mousePos.x * 80}px, ${mousePos.y * 80 + scrollProgress * 80}px)` }}
           >
             <span className="absolute top-[5%] md:top-[15%] right-[5%] md:right-[15%] bg-cobalt text-on-primary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-6 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">FAST</span>
             <span className="absolute bottom-[10%] md:bottom-[20%] left-[5%] md:left-[10%] bg-secondary-container text-on-secondary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase -rotate-12 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">KINETIC</span>
@@ -310,7 +310,7 @@ export default function Hero() {
             {/* Windows 98/XP Dialog Box */}
             <div className="max-w-2xl mx-auto" style={{ fontFamily: 'Tahoma, Arial, sans-serif', filter: 'drop-shadow(6px 6px 0 #000)' }}>
               {/* Title Bar */}
-              <div style={{
+              <div suppressHydrationWarning style={{
                 background: 'linear-gradient(to right, #0a246a, #a6c9f7)',
                 padding: '3px 4px',
                 display: 'flex',
