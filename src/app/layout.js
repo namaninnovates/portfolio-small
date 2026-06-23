@@ -3,21 +3,6 @@ import "./globals.css";
 export const metadata = {
   title: "Naman Gupta's Portfolio",
   description: "Creative by design, editor by craft, dev by choice.",
-  openGraph: {
-    title: "Naman Gupta's Portfolio",
-    description: "Creative by design, editor by craft, dev by choice.",
-    url: 'https://iamnamang.in',
-    siteName: "Naman Gupta's Portfolio",
-    images: [
-      {
-        url: 'https://iamnamang.in/og-image.png', // Fallback or assuming they have one
-        width: 1200,
-        height: 630,
-      }
-    ],
-    locale: 'en_US',
-    type: 'website',
-  }
 };
 
 import InteractiveBackground from "@/components/InteractiveBackground";
