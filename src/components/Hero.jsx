@@ -64,38 +64,50 @@ export default function Hero() {
     const handleResize = () => setWindowHeight(window.innerHeight);
     window.addEventListener("resize", handleResize);
 
+    let scrollRaf;
     const handleScroll = () => {
       if (!heroRef.current) return;
-      const rect = heroRef.current.getBoundingClientRect();
-      let progress = 0;
-      if (rect.top <= 0) {
-        // max progress is 6 for a 600vh container (1 per 100vh scrolling)
-        progress = Math.max(0, Math.min(6, -rect.top / window.innerHeight));
-      }
-      setScrollProgress(progress);
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      scrollRaf = requestAnimationFrame(() => {
+        const rect = heroRef.current.getBoundingClientRect();
+        let progress = 0;
+        if (rect.top <= 0) {
+          // max progress is 6 for a 600vh container (1 per 100vh scrolling)
+          progress = Math.max(0, Math.min(6, -rect.top / window.innerHeight));
+        }
+        setScrollProgress(progress);
+      });
     };
     
+    let pointerRaf;
     const handlePointerMove = (e) => {
-      if (e.pointerType === "touch") return;
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      setMousePos({ x, y });
-      setCursorPx({ x: e.clientX, y: e.clientY });
+      if (e.pointerType === "touch") return; // Keep mouse parallax for desktop
+      if (pointerRaf) cancelAnimationFrame(pointerRaf);
+      pointerRaf = requestAnimationFrame(() => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 2;
+        const y = (e.clientY / window.innerHeight - 0.5) * 2;
+        setMousePos({ x, y });
+        setCursorPx({ x: e.clientX, y: e.clientY });
+      });
     };
 
+    let gyroRaf;
     let lastGyroTime = 0;
     const handleOrientation = (e) => {
       if (e.gamma === null || e.beta === null) return;
       
       const now = performance.now();
-      // Throttle to 10fps to let CSS transitions smoothly interpolate and remove jitter
-      if (now - lastGyroTime < 100) return;
+      // Throttle to ~30fps max to prevent mobile lag
+      if (now - lastGyroTime < 33) return;
       lastGyroTime = now;
 
-      // Dampen sensitivity by 50% for mobile
-      let x = Math.max(-1, Math.min(1, e.gamma / 90)) * 0.5;
-      let y = Math.max(-1, Math.min(1, (e.beta - 45) / 90)) * 0.5;
-      setMousePos({ x, y });
+      if (gyroRaf) cancelAnimationFrame(gyroRaf);
+      gyroRaf = requestAnimationFrame(() => {
+        // Dampen sensitivity by 60% for smooth mobile feel
+        let x = Math.max(-1, Math.min(1, e.gamma / 90)) * 0.4;
+        let y = Math.max(-1, Math.min(1, (e.beta - 45) / 90)) * 0.4;
+        setMousePos({ x, y });
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -108,6 +120,9 @@ export default function Hero() {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("deviceorientation", handleOrientation);
+      if (scrollRaf) cancelAnimationFrame(scrollRaf);
+      if (pointerRaf) cancelAnimationFrame(pointerRaf);
+      if (gyroRaf) cancelAnimationFrame(gyroRaf);
     };
   }, []);
 
@@ -171,7 +186,6 @@ export default function Hero() {
           style={{ 
             transform: b1Transform, 
             opacity: b1Opacity,
-            transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
             pointerEvents: scrollProgress < 0.5 ? 'auto' : 'none',
             willChange: 'transform, opacity'
           }}
@@ -256,7 +270,6 @@ export default function Hero() {
           style={{ 
             transform: b2Transform, 
             opacity: b2Opacity,
-            transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
             pointerEvents: (scrollProgress > 0.5 && scrollProgress < 1.7) ? 'auto' : 'none',
             willChange: 'transform, opacity'
           }}
@@ -411,7 +424,6 @@ export default function Hero() {
           style={{ 
             transform: b3Transform, 
             opacity: b3Opacity,
-            transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
             pointerEvents: scrollProgress > 2.3 ? 'auto' : 'none',
             willChange: 'transform, opacity'
           }}
