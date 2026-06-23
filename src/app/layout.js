@@ -14,6 +14,7 @@ export const metadata = {
 
 import InteractiveBackground from "@/components/InteractiveBackground";
 import { Analytics } from "@vercel/analytics/react";
+import Script from "next/script";
 import { Anton, Hanken_Grotesk, Space_Mono } from 'next/font/google'
 
 const anton = Anton({
@@ -46,12 +47,19 @@ export default function RootLayout({ children }) {
         
         {/* Asynchronous load for Material Symbols icon font to prevent render blocking */}
         <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" media="print" onLoad="this.media='all'" />
         <noscript>
           <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
         </noscript>
       </head>
       <body className="text-on-background font-body-md w-full selection:bg-primary-container selection:text-on-background cursor-none" style={{ overflowX: 'clip' }}>
+        <Script id="material-icons-css" strategy="afterInteractive">
+          {`
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap';
+            document.head.appendChild(link);
+          `}
+        </Script>
         <InteractiveBackground />
         {children}
         <Analytics />
