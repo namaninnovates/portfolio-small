@@ -1,6 +1,8 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/db'
+import { works } from '@/db/schema'
+import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { v2 as cloudinary } from 'cloudinary'
 
@@ -39,7 +41,7 @@ export async function createWork(formData) {
       mediaType: formData.get('mediaType') || 'image',
     }
 
-    await prisma.work.create({ data })
+    await db.insert(works).values(data)
     revalidatePath('/')
     revalidatePath('/admin')
     return { success: true }
@@ -69,10 +71,7 @@ export async function updateWork(id, formData) {
       data.mediaType = formData.get('existingMediaType') || 'image'
     }
 
-    await prisma.work.update({
-      where: { id },
-      data
-    })
+    await db.update(works).set(data).where(eq(works.id, id))
     revalidatePath('/')
     revalidatePath('/admin')
     return { success: true }
@@ -84,7 +83,7 @@ export async function updateWork(id, formData) {
 
 export async function deleteWork(id) {
   try {
-    await prisma.work.delete({ where: { id } })
+    await db.delete(works).where(eq(works.id, id))
     revalidatePath('/')
     revalidatePath('/admin')
     return { success: true }
@@ -97,10 +96,7 @@ export async function deleteWork(id) {
 export async function updateWorksOrder(orderedIds) {
   try {
     for (let i = 0; i < orderedIds.length; i++) {
-      await prisma.work.update({
-        where: { id: orderedIds[i] },
-        data: { order: i }
-      })
+      await db.update(works).set({ order: i }).where(eq(works.id, orderedIds[i]))
     }
     revalidatePath('/')
     revalidatePath('/works')

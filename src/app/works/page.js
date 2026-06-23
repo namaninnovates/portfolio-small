@@ -1,14 +1,17 @@
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Work from '@/components/Work'
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/db'
+import { works as worksSchema } from '@/db/schema'
+import { asc, desc } from 'drizzle-orm'
 
 export const dynamic = 'force-dynamic'
 
 export default async function WorksPage() {
-  const works = await prisma.work.findMany({
-    orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
-  })
+  const works = await db
+    .select()
+    .from(worksSchema)
+    .orderBy(asc(worksSchema.order), desc(worksSchema.createdAt))
 
   return (
     <main className="min-h-screen bg-background">

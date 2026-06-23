@@ -5,15 +5,18 @@ import Stats from '@/components/Stats'
 import Work from '@/components/Work'
 import Testimonials from '@/components/Testimonials'
 import Footer from '@/components/Footer'
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/db'
+import { works as worksSchema } from '@/db/schema'
+import { asc, desc } from 'drizzle-orm'
 
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-  const works = await prisma.work.findMany({
-    orderBy: [{ order: 'asc' }, { createdAt: 'desc' }],
-    take: 12
-  })
+  const works = await db
+    .select()
+    .from(worksSchema)
+    .orderBy(asc(worksSchema.order), desc(worksSchema.createdAt))
+    .limit(12)
 
   return (
     <>

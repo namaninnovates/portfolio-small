@@ -1,6 +1,8 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/db'
+import { enquiries } from '@/db/schema'
+import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 
 export async function createEnquiry(formData) {
@@ -18,7 +20,7 @@ export async function createEnquiry(formData) {
       return { error: 'All fields are required.' }
     }
 
-    await prisma.enquiry.create({ data })
+    await db.insert(enquiries).values(data)
     return { success: true }
   } catch (error) {
     console.error('Failed to submit enquiry:', error)
@@ -28,7 +30,7 @@ export async function createEnquiry(formData) {
 
 export async function deleteEnquiry(id) {
   try {
-    await prisma.enquiry.delete({ where: { id } })
+    await db.delete(enquiries).where(eq(enquiries.id, id))
     revalidatePath('/admin')
     return { success: true }
   } catch (error) {

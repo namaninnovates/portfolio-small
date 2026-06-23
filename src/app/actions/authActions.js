@@ -4,19 +4,27 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { SignJWT } from 'jose'
+import bcrypt from 'bcryptjs'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-development-only'
 const key = new TextEncoder().encode(JWT_SECRET)
 
 export async function loginAction(prevState, formData) {
   const password = formData.get('password')
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin' // Fallback for local testing
+  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH
   
   if (!password) {
     return { error: 'Please fill in this field' }
   }
 
-  if (password === adminPassword) {
+  if (!adminPasswordHash) {
+    console.error('ADMIN_PASSWORD_HASH is not set in environment variables');
+    return { error: 'Authentication is currently unavailable' }
+  }
+
+  const isValid = bcrypt.compareSync(password, adminPasswordHash)
+
+  if (isValid) {
     // Generate secure signed JWT
     const token = await new SignJWT({ authenticated: true })
       .setProtectedHeader({ alg: 'HS256' })
