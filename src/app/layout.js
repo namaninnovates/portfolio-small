@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Multidisciplinary Creative Portfolio",
+  title: "Naman Gupta Portfolio",
   description: "Creative by design, editor by craft, dev by choice.",
 };
 
