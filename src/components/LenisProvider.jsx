@@ -7,10 +7,9 @@ export default function LenisProvider({ children }) {
   useEffect(() => {
     const lenis = new Lenis({
       smoothWheel: true,
-      syncTouch: true, // Crucial for mobile smooth scrolling! Hijacks native scroll.
+      syncTouch: false, // Disabling this fixes the weird jumping/scrolling issues on iPhone
       lerp: 0.08, // The lower the number, the smoother and heavier the inertia feels
       wheelMultiplier: 1,
-      touchMultiplier: 2,
     });
 
     let rafId;
