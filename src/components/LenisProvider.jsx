@@ -5,12 +5,15 @@ import 'lenis/dist/lenis.css';
 export default function LenisProvider({ children }) {
   return (
     <ReactLenis root options={{ 
-      lerp: 0.05, // Lower lerp makes the scroll significantly "smoother" and buttery
+      lerp: 0.07,
+      duration: 1.2,
       smoothWheel: true, 
-      smoothTouch: true, // Enables smooth scrolling for touch devices
+      syncTouch: true,
+      syncTouchLerp: 0.04,
+      touchInertiaMultiplier: 35,
       wheelMultiplier: 1,
-      touchMultiplier: 2, // Speeds up the touch scroll so it doesn't feel sluggish
-      infinite: false
+      infinite: false,
+      autoResize: true,
     }}>
       {children}
     </ReactLenis>
