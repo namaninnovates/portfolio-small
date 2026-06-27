@@ -389,7 +389,13 @@ export default function Hero() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-8 md:gap-12 relative">
               <button 
-                onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (typeof window !== 'undefined') {
+                    const lenis = window.lenis; // If globally available, or we can use native scroll but let's dispatch an event, or better, we can grab lenis from useLenis
+                  }
+                  document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' });
+                }}
                 className="bg-primary-container text-on-background border-4 border-on-background px-10 py-5 font-headline-md text-headline-md uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2 w-full sm:w-auto relative group"
               >
                 <span className="relative z-10 flex items-center justify-center gap-4">
