@@ -7,8 +7,9 @@ export default function LenisProvider({ children }) {
     <ReactLenis root options={{ 
       lerp: 0.1,
       smoothWheel: true, 
-      smoothTouch: true,
-      touchMultiplier: 2.5,
+      syncTouch: true,
+      syncTouchLerp: 0.08,
+      touchInertiaMultiplier: 25,
       wheelMultiplier: 1,
       infinite: false,
       autoResize: true,
