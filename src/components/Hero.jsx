@@ -184,17 +184,23 @@ const FigmaLogo = ({ className }) => (
 );
 
 export default function Hero() {
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [windowHeight, setWindowHeight] = useState(1000);
   const [isBulbHit, setIsBulbHit] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [isBulbSwinging, setIsBulbSwinging] = useState(false);
+  
   const heroRef = useRef(null);
   const b1Ref = useRef(null);
   const b2Ref = useRef(null);
   const b3Ref = useRef(null);
+  const m1Ref = useRef(null);
+  const m2Ref = useRef(null);
+  const m3Ref = useRef(null);
+  const roadmapSvgRef = useRef(null);
+  const roadmapContainerRef = useRef(null);
+  
   const activeStepRef = useRef(0);
   const bulbSwingingRef = useRef(false);
+  const viewportHeightRef = useRef(1000);
 
   const handleBulbHit = () => {
     if (isBulbHit) return;
@@ -203,13 +209,19 @@ export default function Hero() {
   };
 
   useEffect(() => {
-    setWindowHeight(window.innerHeight);
-    const handleResize = () => setWindowHeight(window.innerHeight);
+    const handleResize = () => {
+      if (heroRef.current) {
+        viewportHeightRef.current = heroRef.current.clientHeight / 5;
+      } else {
+        viewportHeightRef.current = window.innerHeight;
+      }
+    };
+    handleResize();
     window.addEventListener("resize", handleResize);
     
     let pointerRaf;
     const handlePointerMove = (e) => {
-      if (e.pointerType === "touch") return; // Keep mouse parallax for desktop
+      if (e.pointerType === "touch") return; 
       if (pointerRaf) cancelAnimationFrame(pointerRaf);
       pointerRaf = requestAnimationFrame(() => {
         const x = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -227,15 +239,11 @@ export default function Hero() {
     let lastGyroTime = 0;
     const handleOrientation = (e) => {
       if (e.gamma === null || e.beta === null) return;
-      
       const now = performance.now();
-      // Throttle to ~30fps max to prevent mobile lag
       if (now - lastGyroTime < 33) return;
       lastGyroTime = now;
-
       if (gyroRaf) cancelAnimationFrame(gyroRaf);
       gyroRaf = requestAnimationFrame(() => {
-        // Dampen sensitivity by 60% for smooth mobile feel
         let x = Math.max(-1, Math.min(1, e.gamma / 90)) * 0.4;
         let y = Math.max(-1, Math.min(1, (e.beta - 45) / 90)) * 0.4;
         if (heroRef.current) {
@@ -247,19 +255,7 @@ export default function Hero() {
 
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("deviceorientation", handleOrientation);
-    if (heroRef.current) {
-        const h = heroRef.current.style;
-        h.setProperty('--sp', 0);
-        h.setProperty('--b1-y', '0vh');
-        h.setProperty('--b1-o', 1);
-        h.setProperty('--b2-y', '100vh');
-        h.setProperty('--b2-o', 0);
-        h.setProperty('--b3-y', '100vh');
-        h.setProperty('--b3-o', 0);
-        h.setProperty('--isy', '0px');
-        h.setProperty('--rp', 0);
-        h.setProperty('--rp-pct', 100);
-    }
+    
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("pointermove", handlePointerMove);
@@ -270,17 +266,51 @@ export default function Hero() {
   }, []);
 
   useLenis(({ scroll }) => {
-    if (!heroRef.current) return;
-    const rect = heroRef.current.getBoundingClientRect();
+    const rectTop = -scroll;
     let progress = 0;
-    if (rect.top <= 0) {
-      const viewportHeight = rect.height / 5;
-      progress = Math.max(0, Math.min(5, -rect.top / viewportHeight));
+    
+    if (rectTop <= 0) {
+      progress = Math.max(0, Math.min(5, -rectTop / viewportHeightRef.current));
     }
-    setScrollProgress(progress);
-
+    
     const e1 = Math.max(0, Math.min(1, progress));
     const e2 = Math.max(0, Math.min(1, progress - 1.2));
+    
+    if (b1Ref.current) {
+      const b1Y = -e1 * 50;
+      b1Ref.current.style.transform = `translate3d(0, ${b1Y}dvh, 0)`;
+      b1Ref.current.style.opacity = 1 - e1;
+      b1Ref.current.style.pointerEvents = progress < 0.8 ? 'auto' : 'none';
+    }
+
+    if (b2Ref.current) {
+      const b2Y = e1 < 1 ? (1 - e1) * 100 : -e2 * 50;
+      b2Ref.current.style.transform = `translate3d(0, ${b2Y}dvh, 0)`;
+      b2Ref.current.style.opacity = e1 < 1 ? e1 : (1 - e2);
+      b2Ref.current.style.pointerEvents = (progress > 0.2 && progress < 2.0) ? 'auto' : 'none';
+    }
+
+    if (b3Ref.current) {
+      b3Ref.current.style.transform = `translate3d(0, ${(1 - e2) * 100}dvh, 0)`;
+      b3Ref.current.style.opacity = e2;
+      b3Ref.current.style.pointerEvents = progress > 1.8 ? 'auto' : 'none';
+    }
+
+    const rp = Math.max(0, Math.min(1, (progress - 2.2) / 2.3));
+    const maxScroll = typeof window !== 'undefined' && window.innerWidth < 768 ? 650 : 600;
+    const isy = -rp * maxScroll;
+
+    if (m1Ref.current) m1Ref.current.style.transform = `translate3d(calc(var(--mx, 0) * -2px), calc(var(--my, 0) * -2px), 0) translateY(${isy * 0.1}px)`;
+    if (m2Ref.current) m2Ref.current.style.transform = `translate3d(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -4px), 0) translateY(${isy * 0.25}px)`;
+    if (m3Ref.current) m3Ref.current.style.transform = `translate3d(calc(var(--mx, 0) * -7px), calc(var(--my, 0) * -7px), 0) translateY(${isy * 0.45}px)`;
+    
+    if (roadmapContainerRef.current) {
+      roadmapContainerRef.current.style.transform = `translate3d(calc(var(--mx, 0) * -20px), calc(var(--my, 0) * -20px), 0) translateY(${isy}px)`;
+    }
+
+    if (roadmapSvgRef.current) {
+      roadmapSvgRef.current.style.strokeDashoffset = 100 - rp * 100;
+    }
     
     if (progress > 0.4 && !bulbSwingingRef.current) {
        bulbSwingingRef.current = true;
@@ -288,7 +318,6 @@ export default function Hero() {
     }
 
     let step = 0;
-    const rp = Math.max(0, Math.min(1, (progress - 2.2) / 2.3));
     if (rp >= 0.85) step = 4;
     else if (rp >= 0.67) step = 3;
     else if (rp >= 0.40) step = 2;
@@ -299,27 +328,6 @@ export default function Hero() {
       setActiveStep(step);
     }
   });
-
-  const e1 = Math.max(0, Math.min(1, scrollProgress));
-  const e2 = Math.max(0, Math.min(1, scrollProgress - 1.2));
-  
-  const b1Y = -e1 * 50;
-  const b1Opacity = 1 - e1;
-  const b1Transform = `translate3d(0, ${b1Y}dvh, 0)`;
-
-  const b2YEnter = (1 - e1) * 100;
-  const b2YExit  = -e2 * 50;
-  const b2Y = e1 < 1 ? b2YEnter : b2YExit;
-  const b2Opacity = e1 < 1 ? e1 : (1 - e2);
-  const b2Transform = `translate3d(0, ${b2Y}dvh, 0)`;
-
-  const b3Y = (1 - e2) * 100;
-  const b3Opacity = e2;
-  const b3Transform = `translate3d(0, ${b3Y}dvh, 0)`;
-  
-  const rp = Math.max(0, Math.min(1, (scrollProgress - 2.2) / 2.3));
-  const maxScroll = typeof window !== 'undefined' && window.innerWidth < 768 ? 650 : 600;
-  const isy = -rp * maxScroll;
 
   return (
     <section ref={heroRef} className="relative h-[500dvh] w-full">
@@ -337,13 +345,8 @@ export default function Hero() {
         
         {/* --- BLOCK 1: INTRO --- */}
         <div 
-          className="absolute inset-0 flex flex-col justify-center px-margin-mobile md:px-margin-desktop"
-          style={{ 
-            transform: b1Transform, 
-            opacity: b1Opacity,
-            pointerEvents: scrollProgress < 0.8 ? 'auto' : 'none',
-            willChange: 'transform, opacity'
-          }}
+          ref={b1Ref}
+          className="absolute inset-0 flex flex-col justify-center px-margin-mobile md:px-margin-desktop will-change-[transform,opacity]"
         >
           <div 
             className="absolute top-20 right-10 md:right-32 w-32 h-32 bg-primary-container border-4 border-on-background rounded-full mix-blend-multiply opacity-50 blur-3xl animate-pulse"
@@ -415,13 +418,8 @@ export default function Hero() {
 
         {/* --- BLOCK 2: IMPACT STATEMENT --- */}
         <div 
-          className="absolute inset-0 flex flex-col justify-center items-center text-center px-margin-mobile md:px-margin-desktop"
-          style={{ 
-            transform: b2Transform, 
-            opacity: b2Opacity,
-            pointerEvents: (scrollProgress > 0.2 && scrollProgress < 2.0) ? 'auto' : 'none',
-            willChange: 'transform, opacity'
-          }}
+          ref={b2Ref}
+          className="absolute inset-0 flex flex-col justify-center items-center text-center px-margin-mobile md:px-margin-desktop will-change-[transform,opacity] opacity-0"
         >
           <div 
             className="absolute top-1/4 left-1/4 w-64 h-64 bg-cobalt border-4 border-on-background rounded-full mix-blend-multiply opacity-30 blur-3xl animate-pulse"
@@ -553,41 +551,23 @@ export default function Hero() {
 
         {/* --- BLOCK 3: ROADMAP / FLOW --- */}
         <div 
-          className="absolute inset-0 flex flex-col justify-start items-center text-left pt-24 md:pt-32 px-margin-mobile md:px-margin-desktop"
-          style={{ 
-            transform: b3Transform, 
-            opacity: b3Opacity,
-            pointerEvents: scrollProgress > 1.8 ? 'auto' : 'none',
-            willChange: 'transform, opacity'
-          }}
+          ref={b3Ref}
+          className="absolute inset-0 flex flex-col justify-start items-center text-left pt-24 md:pt-32 px-margin-mobile md:px-margin-desktop will-change-[transform,opacity] opacity-0"
         >
           <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-            <div 
-              className="absolute inset-0 opacity-30 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate3d(calc(var(--mx, 0) * -2px), calc(var(--my, 0) * -2px), 0) translateY(${isy * 0.1}px)` }}
-            >
+            <div ref={m1Ref} className="absolute inset-0 opacity-30">
               <div className="absolute top-[10%] left-[15%] -rotate-12 scale-75"><MarioPipe /></div>
               <div className="absolute top-[35%] right-[25%] rotate-[25deg] scale-50"><MarioCoin /></div>
               <div className="absolute top-[65%] left-[8%] -rotate-6 scale-90"><MarioBrick /></div>
               <div className="absolute top-[85%] right-[12%] rotate-12 scale-75"><MarioQuestion /></div>
             </div>
-
-            {/* Layer 2 (Middle Depth) */}
-            <div 
-              className="absolute inset-0 opacity-50 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate3d(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -4px), 0) translateY(${isy * 0.25}px)` }}
-            >
+            <div ref={m2Ref} className="absolute inset-0 opacity-50">
               <div className="absolute top-[5%] left-[30%] rotate-6 scale-90"><MarioCoin /></div>
               <div className="absolute top-[45%] right-[8%] -rotate-[15deg] scale-100"><MarioPipe /></div>
               <div className="absolute top-[75%] left-[25%] rotate-[30deg] scale-75"><MarioCoin /></div>
               <div className="absolute top-[90%] right-[35%] -rotate-12 scale-90"><MarioBrick /></div>
             </div>
-
-            {/* Layer 3 (Closest Background, Fastest) */}
-            <div 
-              className="absolute inset-0 opacity-80 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate3d(calc(var(--mx, 0) * -7px), calc(var(--my, 0) * -7px), 0) translateY(${isy * 0.45}px)` }}
-            >
+            <div ref={m3Ref} className="absolute inset-0 opacity-80">
               <div className="absolute top-[15%] right-[15%] rotate-12 scale-110"><MarioQuestion /></div>
               <div className="absolute top-[28%] left-[5%] -rotate-12 scale-125"><MarioBrick /></div>
               <div className="absolute top-[55%] left-[18%] rotate-6 scale-110"><MarioQuestion /></div>
@@ -595,17 +575,12 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="relative z-20 w-full max-w-6xl mx-auto transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * -20px), calc(var(--my, 0) * -20px), 0) translateY(${isy}px)` }}>
-            
+          <div ref={roadmapContainerRef} className="relative z-20 w-full max-w-6xl mx-auto">
             <h2 className="font-display-xl text-headline-lg-mobile md:text-display-xl uppercase leading-none mb-2 text-center">
               HOW I <span className="bg-primary-container text-on-background px-4 py-1 inline-block -rotate-2 border-[4px] border-on-background shadow-[4px_4px_0_0_#1b1c15] md:shadow-[8px_8px_0_0_#1b1c15]">WORK</span>
             </h2>
 
-            {/* The Animated Roadmap */}
             <div className="w-full h-[1100px] md:h-[850px] max-w-6xl mx-auto relative mt-8 pb-8">
-              
-              {/* Extremely Curvy Snake SVG Timeline */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <path 
                   d="M 5 0 C 5 15, 85 5, 85 20 C 85 40, 5 30, 5 45 C 5 65, 90 55, 90 70 C 90 90, 30 85, 40 100" 
@@ -617,6 +592,7 @@ export default function Hero() {
                   className="opacity-20"
                 />
                 <path 
+                  ref={roadmapSvgRef}
                   d="M 5 0 C 5 15, 85 5, 85 20 C 85 40, 5 30, 5 45 C 5 65, 90 55, 90 70 C 90 90, 30 85, 40 100" 
                   fill="none" 
                   stroke="var(--color-cobalt)" 
@@ -624,17 +600,16 @@ export default function Hero() {
                   vectorEffect="non-scaling-stroke" 
                   pathLength="100"
                   strokeDasharray="100"
-                  strokeDashoffset={100 - rp * 100}
-                  className="transition-all duration-75 drop-shadow-[0_0_8px_var(--color-cobalt)]"
+                  strokeDashoffset={100}
+                  className="drop-shadow-[0_0_8px_var(--color-cobalt)]"
                 />
               </svg>
 
-              {/* Extremely Scattered Roadmap Steps */}
               {[
-                { title: "The Brain Dump", icon: <PixelIcon art={coffeeArt} color="#ccff00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-cobalt text-on-primary", copy: "We hop on a call and you share your vision. I take detailed notes and promise not to judge your rough sketches.", activeAt: 0.13, top: "5%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
-                { title: "The Workshop", icon: <PixelIcon art={hammerArt} color="#ffffff" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-secondary text-on-secondary", copy: "I put my headphones on and get to work. Whether it's code, keyframes, or layouts, this is where the puzzle pieces start fitting together.", activeAt: 0.40, top: "27%", leftClasses: "left-[4%] md:left-12", rotate: "-rotate-3" },
-                { title: "The Polish", icon: <PixelIcon art={starArt} color="#ffcc00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-primary-container text-on-background", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", activeAt: 0.67, top: "50%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
-                { title: "The Handoff", icon: <PixelIcon art={rocketArt} color="#ccff00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-on-background text-background", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", activeAt: 0.85, top: "73%", leftClasses: "left-[4%] md:left-1/4", rotate: "-rotate-6" }
+                { title: "The Brain Dump", icon: <PixelIcon art={coffeeArt} color="#ccff00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-cobalt text-on-primary", copy: "We hop on a call and you share your vision. I take detailed notes and promise not to judge your rough sketches.", top: "5%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
+                { title: "The Workshop", icon: <PixelIcon art={hammerArt} color="#ffffff" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-secondary text-on-secondary", copy: "I put my headphones on and get to work. Whether it's code, keyframes, or layouts, this is where the puzzle pieces start fitting together.", top: "27%", leftClasses: "left-[4%] md:left-12", rotate: "-rotate-3" },
+                { title: "The Polish", icon: <PixelIcon art={starArt} color="#ffcc00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-primary-container text-on-background", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", top: "50%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
+                { title: "The Handoff", icon: <PixelIcon art={rocketArt} color="#ccff00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-on-background text-background", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", top: "73%", leftClasses: "left-[4%] md:left-1/4", rotate: "-rotate-6" }
               ].map((step, idx) => {
                 const isActive = activeStep > idx;
                 return (
@@ -642,7 +617,6 @@ export default function Hero() {
                     className={`absolute ${step.leftClasses} w-[92%] md:w-[45%] group z-10 transition-transform duration-500 ease-out ${isActive ? step.rotate : 'rotate-0'}`}
                     style={{ top: step.top }}
                   >
-                    {/* Content Box */}
                     <div className={`border-4 border-on-background p-3 md:p-6 transition-all duration-500 ease-out ${isActive ? 'bg-background neo-shadow opacity-100 scale-100' : 'bg-surface-container-high opacity-50 grayscale scale-[0.6] md:scale-75 blur-[1px] -translate-y-8'}`}>
                       <div className="flex items-center gap-3 md:gap-4 mb-2 border-b-4 border-on-background pb-2">
                         <span className={`flex-shrink-0 ${step.bg} border-4 border-on-background w-12 h-12 md:w-16 md:h-16 flex items-center justify-center neo-shadow transition-transform duration-500 ${isActive ? '-rotate-12 scale-110' : 'rotate-0 scale-100'}`}>
@@ -661,7 +635,6 @@ export default function Hero() {
             </div>
           </div>
         </div>
-
       </div>
     </section>
   );
