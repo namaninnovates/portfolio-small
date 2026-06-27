@@ -4,27 +4,28 @@ import { db } from '@/lib/db'
 import { works } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
-import { v2 as cloudinary } from 'cloudinary'
+import { r2Client } from '@/lib/r2'
+import { PutObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
-// Configure cloudinary with environment variables
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+export async function getUploadPresignedUrl(filename, contentType) {
+  try {
+    const key = `portfolio/${Date.now()}-${filename.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+    const command = new PutObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: key,
+      ContentType: contentType,
+    });
+    
+    const signedUrl = await getSignedUrl(r2Client, command, { expiresIn: 3600 });
+    // Remove trailing slash from public URL if present to ensure proper formatting
+    const baseUrl = process.env.R2_PUBLIC_URL.replace(/\/$/, '');
+    const publicUrl = `${baseUrl}/${key}`;
 
-export async function getCloudinarySignature() {
-  const timestamp = Math.round(new Date().getTime() / 1000)
-  const signature = cloudinary.utils.api_sign_request(
-    { timestamp, folder: 'portfolio', source: 'uw' },
-    process.env.CLOUDINARY_API_SECRET
-  )
-  
-  return {
-    timestamp,
-    signature,
-    apiKey: process.env.CLOUDINARY_API_KEY,
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    return { success: true, signedUrl, publicUrl };
+  } catch (error) {
+    console.error('Failed to generate presigned URL:', error);
+    return { success: false, error: 'Failed to generate upload URL' };
   }
 }
 

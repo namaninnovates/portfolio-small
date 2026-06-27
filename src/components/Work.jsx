@@ -60,6 +60,16 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                 {(() => {
                   const urlParts = work.imageUrl.split('#pos=');
                   const src = urlParts[0];
+                  
+                  const srcUrlParts = src.split('#t=');
+                  let trimStart = 0;
+                  let trimEnd = 0;
+                  if (srcUrlParts[1]) {
+                    const times = srcUrlParts[1].split(',');
+                    trimStart = parseFloat(times[0]) || 0;
+                    trimEnd = parseFloat(times[1]) || 0;
+                  }
+
                   const [posX, posY, scale] = urlParts[1] ? urlParts[1].split(',') : ['50', '50', '100'];
                   const objectPosition = `${posX}% ${posY}%`;
                   const S = parseInt(scale) / 100;
@@ -76,9 +86,17 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                           data-src={src} 
                           style={{ transform }}
                           muted 
-                          loop 
+                          loop={trimEnd === 0} 
                           playsInline 
                           preload="none"
+                          onTimeUpdate={(e) => {
+                            if (trimEnd > 0 && e.target.currentTime >= trimEnd) {
+                              e.target.currentTime = trimStart || 0;
+                              e.target.play().catch(()=>{});
+                            } else if (trimStart > 0 && e.target.currentTime < trimStart) {
+                              e.target.currentTime = trimStart;
+                            }
+                          }}
                           ref={(el) => { 
                             if (el) { 
                               el.defaultMuted = true; 

@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Script from 'next/script'
-import { createWork, updateWork, deleteWork, getCloudinarySignature, updateWorksOrder } from '@/app/actions/workActions'
+import { useState, useEffect, useRef } from 'react'
+import { createWork, updateWork, deleteWork, getUploadPresignedUrl, updateWorksOrder } from '@/app/actions/workActions'
 import { logoutAction } from '@/app/actions/authActions'
 import { deleteEnquiry } from '@/app/actions/enquiryActions'
 
@@ -16,6 +15,7 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
   const [uploadProgress, setUploadProgress] = useState({ active: false, percent: 0, loadedMB: 0, totalMB: 0 })
   const [uploadedMedia, setUploadedMedia] = useState(null)
   const [videoTrim, setVideoTrim] = useState({ start: 0, end: 0 })
+  const fileInputRef = useRef(null)
 
   const [formState, setFormState] = useState({
     title: '', description: '', tags: '', tools: '', projectUrl: '', liveUrl: ''
@@ -45,48 +45,82 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
     }
   }, [editingWork])
 
-  const handleOpenWidget = async () => {
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 100000000) {
+      alert("File size exceeds 100MB limit.");
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+    
     try {
       setIsWidgetLoading(true);
-      if (typeof window === 'undefined' || !window.cloudinary) {
-        alert("Cloudinary script is still loading. Please wait a few seconds and try again.");
+      const { success, signedUrl, publicUrl, error } = await getUploadPresignedUrl(file.name, file.type);
+      
+      if (!success) {
+        alert(error || 'Failed to initialize upload.');
         setIsWidgetLoading(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
         return;
       }
-      const sigData = await getCloudinarySignature();
-      if (!sigData || !sigData.cloudName || !sigData.apiKey || !sigData.signature) {
-        alert("Cloudinary configuration is missing. Ensure CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, and CLOUDINARY_CLOUD_NAME are set in your Vercel deployment.");
-        setIsWidgetLoading(false);
-        return;
-      }
-      const widget = window.cloudinary.createUploadWidget({
-        cloudName: sigData.cloudName,
-        apiKey: sigData.apiKey,
-        uploadSignatureTimestamp: sigData.timestamp,
-        uploadSignature: sigData.signature,
-        folder: 'portfolio',
-        clientAllowedFormats: ['image', 'video'],
-        maxFileSize: 100000000,
-        sources: ['local', 'url']
-      }, (error, result) => {
-        if (!error && result && result.event === "success") {
-          const isVideo = result.info.resource_type === 'video';
-          setUploadedMedia({
-            url: result.info.secure_url,
-            type: isVideo ? 'video' : 'image',
-            duration: result.info.duration || 0
-          });
-          if (isVideo) {
-            setVideoTrim({ start: 0, end: result.info.duration || 0 });
-          }
+      
+      setUploadProgress({ active: true, percent: 0, loadedMB: 0, totalMB: (file.size / (1024 * 1024)).toFixed(2) });
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', signedUrl, true);
+      xhr.setRequestHeader('Content-Type', file.type);
+      
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          const loadedMB = (e.loaded / (1024 * 1024)).toFixed(2);
+          setUploadProgress(prev => ({ ...prev, percent, loadedMB }));
         }
-      });
-      widget.open();
-      setIsWidgetLoading(false);
+      };
+      
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const isVideo = file.type.startsWith('video/');
+          setUploadedMedia({
+            url: publicUrl,
+            type: isVideo ? 'video' : 'image',
+            duration: 0
+          });
+          
+          if (isVideo) {
+            const videoElement = document.createElement('video');
+            videoElement.preload = 'metadata';
+            videoElement.onloadedmetadata = () => {
+              setUploadedMedia(prev => ({ ...prev, duration: videoElement.duration }));
+              setVideoTrim({ start: 0, end: videoElement.duration });
+            };
+            videoElement.src = URL.createObjectURL(file);
+          }
+          
+          setUploadProgress({ active: false, percent: 100, loadedMB: 0, totalMB: 0 });
+        } else {
+          alert('Upload failed: ' + xhr.statusText);
+          setUploadProgress({ active: false, percent: 0, loadedMB: 0, totalMB: 0 });
+        }
+        setIsWidgetLoading(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      };
+      
+      xhr.onerror = () => {
+        alert('Upload error occurred');
+        setUploadProgress({ active: false, percent: 0, loadedMB: 0, totalMB: 0 });
+        setIsWidgetLoading(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      };
+      
+      xhr.send(file);
     } catch (err) {
-      alert('Failed to initialize upload widget.');
+      alert('Upload process failed.');
       console.error(err);
       setIsWidgetLoading(false);
+      setUploadProgress({ active: false, percent: 0, loadedMB: 0, totalMB: 0 });
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }
 
@@ -140,15 +174,8 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
         mediaType = uploadedMedia.type;
 
         if (mediaType === 'video') {
-          const transforms = [];
-          if (videoTrim.start > 0) transforms.push(`so_${videoTrim.start}`);
-          if (videoTrim.end > 0 && videoTrim.end < uploadedMedia.duration) transforms.push(`eo_${videoTrim.end}`);
-          
-          // Always apply high quality and native frame rate up to 60fps
-          transforms.push('q_auto:best', 'fps_60-');
-          
-          if (secureUrl.includes('/upload/')) {
-            secureUrl = secureUrl.replace('/upload/', `/upload/${transforms.join(',')}/`);
+          if (videoTrim.start > 0 || (videoTrim.end > 0 && videoTrim.end < uploadedMedia.duration)) {
+             secureUrl = `${secureUrl}#t=${videoTrim.start},${videoTrim.end || uploadedMedia.duration}`;
           }
         }
       }
@@ -246,7 +273,6 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
 
   return (
     <div className="min-h-screen bg-surface-container-low p-4 md:p-8">
-      <Script src="https://upload-widget.cloudinary.com/global/all.js" strategy="lazyOnload" />
       <header className="flex justify-between items-center mb-8 border-b-4 border-on-background pb-4">
         <h1 className="font-headline-lg text-headline-lg uppercase">Admin Dashboard</h1>
         <div className="flex gap-4">
@@ -348,7 +374,7 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
                           <input type="number" step="0.1" min={videoTrim.start} max={uploadedMedia.duration} value={videoTrim.end} onChange={(e) => setVideoTrim({...videoTrim, end: parseFloat(e.target.value) || 0})} className="w-full border-2 border-on-background p-1.5 text-sm bg-background font-label-mono focus:outline-none focus:border-cobalt" />
                         </div>
                       </div>
-                      <p className="text-[10px] text-on-surface-variant uppercase font-label-mono leading-tight">The video will be permanently trimmed and cropped based on these values when you click Save Work. Changes are processed safely by Cloudinary.</p>
+                      <p className="text-[10px] text-on-surface-variant uppercase font-label-mono leading-tight">The video will be visually trimmed based on these values. Trimming is applied in the browser to maintain the original file quality.</p>
                     </div>
                   )}
 
@@ -377,14 +403,27 @@ export default function AdminClient({ initialWorks, initialEnquiries = [] }) {
                     </div>
                   )}
 
+                  {uploadProgress.active && (
+                    <div className="mb-2 bg-surface-variant border-2 border-on-background p-2">
+                      <div className="flex justify-between font-label-mono text-[10px] uppercase mb-1">
+                        <span>Uploading...</span>
+                        <span>{uploadProgress.percent}% ({uploadProgress.loadedMB} / {uploadProgress.totalMB} MB)</span>
+                      </div>
+                      <div className="w-full bg-background h-2 border-2 border-on-background overflow-hidden">
+                        <div className="bg-cobalt h-full transition-all" style={{ width: `${uploadProgress.percent}%` }}></div>
+                      </div>
+                    </div>
+                  )}
+
+                  <input type="file" ref={fileInputRef} onChange={handleFileSelect} className="hidden" accept="image/*,video/*" />
                   <button 
                     type="button" 
-                    onClick={handleOpenWidget} 
-                    disabled={isWidgetLoading}
+                    onClick={() => fileInputRef.current?.click()} 
+                    disabled={isWidgetLoading || uploadProgress.active}
                     className="w-full bg-surface-variant text-on-background border-4 border-on-background p-2 font-label-mono text-label-mono uppercase hover:bg-cobalt hover:text-white transition-all text-left flex justify-between items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <span>{isWidgetLoading ? 'Initializing Widget...' : (uploadedMedia || (editingWork && editingWork.imageUrl) ? 'Change Media (Trim/Crop)' : 'Upload Media (Trim/Crop)')}</span>
-                    <span className="material-symbols-outlined">{isWidgetLoading ? 'hourglass_empty' : 'upload'}</span>
+                    <span>{isWidgetLoading || uploadProgress.active ? 'Uploading...' : (uploadedMedia || (editingWork && editingWork.imageUrl) ? 'Change Media (Trim/Crop)' : 'Upload Media (Trim/Crop)')}</span>
+                    <span className="material-symbols-outlined">{isWidgetLoading || uploadProgress.active ? 'hourglass_empty' : 'upload'}</span>
                   </button>
 
                 </div>

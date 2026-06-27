@@ -14,6 +14,7 @@ export const metadata = {
 
 import InteractiveBackground from "@/components/InteractiveBackground";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 import { Anton, Hanken_Grotesk, Space_Mono } from 'next/font/google'
 
@@ -67,6 +68,7 @@ export default function RootLayout({ children }) {
           {children}
         </LenisProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

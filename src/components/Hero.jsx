@@ -72,8 +72,8 @@ export default function Hero() {
         const rect = heroRef.current.getBoundingClientRect();
         let progress = 0;
         if (rect.top <= 0) {
-          // max progress is 6 for a 600vh container (1 per 100vh scrolling)
-          progress = Math.max(0, Math.min(6, -rect.top / window.innerHeight));
+          // max progress is 4 for a 500vh container (400vh of scrolling before exit)
+          progress = Math.max(0, Math.min(5, -rect.top / window.innerHeight));
         }
         setScrollProgress(progress);
       });
@@ -173,7 +173,7 @@ export default function Hero() {
   const innerScrollY = -roadmapProgress * maxScroll;
 
   return (
-    <section ref={heroRef} className="relative h-[600vh] w-full">
+    <section ref={heroRef} className="relative h-[500vh] w-full">
       {/* perspective-origin on the sticky viewport gives the cylinder its vanishing point */}
       <div className="sticky top-[90px] md:top-[110px] h-[calc(100vh-90px)] md:h-[calc(100vh-110px)] w-full overflow-hidden" style={{ overflow: 'clip' }}>
         <div className="absolute inset-0 bg-grid-pattern opacity-50 pointer-events-none z-0"></div>
@@ -484,8 +484,8 @@ export default function Hero() {
             {/* The Animated Roadmap */}
             <div className="w-full h-[1100px] md:h-[850px] max-w-6xl mx-auto relative mt-8 pb-8">
               
-              {/* Extremely Curvy Snake SVG Timeline (Desktop) */}
-              <svg className="hidden md:block absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
+              {/* Extremely Curvy Snake SVG Timeline */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
                 <path 
                   d="M 5 0 C 5 15, 85 5, 85 20 C 85 40, 5 30, 5 45 C 5 65, 90 55, 90 70 C 90 90, 30 85, 40 100" 
                   fill="none" 
@@ -497,30 +497,6 @@ export default function Hero() {
                 />
                 <path 
                   d="M 5 0 C 5 15, 85 5, 85 20 C 85 40, 5 30, 5 45 C 5 65, 90 55, 90 70 C 90 90, 30 85, 40 100" 
-                  fill="none" 
-                  stroke="var(--color-cobalt)" 
-                  strokeWidth="8" 
-                  vectorEffect="non-scaling-stroke" 
-                  pathLength="100"
-                  strokeDasharray="100"
-                  strokeDashoffset={100 - roadmapProgress * 100}
-                  className="transition-all duration-75 drop-shadow-[0_0_8px_var(--color-cobalt)]"
-                />
-              </svg>
-
-              {/* Straight Timeline (Mobile) */}
-              <svg className="md:hidden absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path 
-                  d="M 8 0 L 8 100" 
-                  fill="none" 
-                  stroke="var(--color-on-background)" 
-                  strokeWidth="4" 
-                  strokeDasharray="6 6" 
-                  vectorEffect="non-scaling-stroke" 
-                  className="opacity-20"
-                />
-                <path 
-                  d="M 8 0 L 8 100" 
                   fill="none" 
                   stroke="var(--color-cobalt)" 
                   strokeWidth="8" 
@@ -534,10 +510,10 @@ export default function Hero() {
 
               {/* Extremely Scattered Roadmap Steps */}
               {[
-                { title: "The Brain Dump", icon: "☕", copy: "We hop on a call and you share your vision. I take detailed notes and promise not to judge your rough sketches.", activeAt: 0.05, top: "5%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
-                { title: "The Workshop", icon: "🛠️", copy: "I put my headphones on and get to work. Whether it's code, keyframes, or layouts, this is where the puzzle pieces start fitting together.", activeAt: 0.28, top: "28%", leftClasses: "left-2 md:left-12", rotate: "-rotate-3" },
-                { title: "The Polish", icon: "✨", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", activeAt: 0.52, top: "52%", leftClasses: "left-0 md:left-1/2", rotate: "rotate-6" },
-                { title: "The Handoff", icon: "🚀", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", activeAt: 0.76, top: "76%", leftClasses: "left-2 md:left-1/4", rotate: "-rotate-6" }
+                { title: "The Brain Dump", icon: "☕", copy: "We hop on a call and you share your vision. I take detailed notes and promise not to judge your rough sketches.", activeAt: 0.13, top: "5%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
+                { title: "The Workshop", icon: "🛠️", copy: "I put my headphones on and get to work. Whether it's code, keyframes, or layouts, this is where the puzzle pieces start fitting together.", activeAt: 0.40, top: "28%", leftClasses: "left-[4%] md:left-12", rotate: "-rotate-3" },
+                { title: "The Polish", icon: "✨", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", activeAt: 0.67, top: "52%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
+                { title: "The Handoff", icon: "🚀", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", activeAt: 0.85, top: "76%", leftClasses: "left-[4%] md:left-1/4", rotate: "-rotate-6" }
               ].map((step, idx) => {
                 const isActive = roadmapProgress >= step.activeAt;
                 return (

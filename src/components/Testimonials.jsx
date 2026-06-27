@@ -84,22 +84,48 @@ export default function Testimonials() {
           CLIENT <span className="bg-secondary-container text-on-secondary-container px-4 py-1 border-4 border-background rotate-2 inline-block">LOVE</span>
         </h2>
         
-        {/* Navigation Arrows */}
-        <div className="flex gap-4 self-end md:self-auto relative z-20">
-          <button 
-            onClick={() => handleManualScroll('left')}
-            className="w-14 h-14 bg-background border-4 border-background flex items-center justify-center hover:bg-secondary-container hover:border-secondary-container transition-colors group"
-            aria-label="Previous Testimonial"
-          >
-            <span className="material-symbols-outlined text-3xl text-on-background group-hover:text-background transition-colors">arrow_back</span>
-          </button>
-          <button 
-            onClick={() => handleManualScroll('right')}
-            className="w-14 h-14 bg-background border-4 border-background flex items-center justify-center hover:bg-secondary-container hover:border-secondary-container transition-colors group"
-            aria-label="Next Testimonial"
-          >
-            <span className="material-symbols-outlined text-3xl text-on-background group-hover:text-background transition-colors">arrow_forward</span>
-          </button>
+        {/* Navigation Arrows and Fiverr Box */}
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-6 self-end md:self-auto relative z-20">
+          {/* Fiverr Rating Ticket/Stamp */}
+          <a href="https://www.fiverr.com/" target="_blank" rel="noopener noreferrer" className="relative flex items-stretch bg-primary-container text-on-background border-[4px] border-on-background p-2 hover:scale-105 hover:-rotate-1 transition-all duration-300 group cursor-pointer z-20 rotate-[4deg] shadow-[8px_8px_0_0_var(--color-background)]">
+            {/* Dashed Border Line */}
+            <div className="absolute inset-1.5 border-2 border-dashed border-on-background pointer-events-none opacity-40"></div>
+            
+            <div className="flex items-stretch relative z-10 px-2 sm:px-3 py-2">
+              {/* Left Side: 5 Star */}
+              <div className="flex flex-col items-center justify-center pr-5 sm:pr-6 border-r-[4px] border-on-background">
+                <div className="flex items-start gap-1">
+                  <span className="font-headline-lg font-black text-5xl md:text-6xl leading-none -mt-1">5</span>
+                  <span className="text-2xl md:text-3xl leading-none mt-1">★</span>
+                </div>
+                <span className="font-label-mono font-bold text-[10px] md:text-xs uppercase tracking-[0.2em] mt-1">Rated</span>
+              </div>
+              
+              {/* Right Side: Fiverr */}
+              <div className="flex flex-col items-start justify-center pl-5 sm:pl-6 pr-1 sm:pr-2">
+                <span className="font-label-mono font-bold text-[9px] md:text-[10px] uppercase tracking-widest mb-1.5">Available On</span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Fiverr_Logo_09.2020.svg" alt="Fiverr" className="h-6 md:h-8 object-contain brightness-0" />
+              </div>
+            </div>
+          </a>
+
+          {/* Navigation Arrows */}
+          <div className="flex gap-4">
+            <button 
+              onClick={() => handleManualScroll('left')}
+              className="w-14 h-14 bg-background border-4 border-background flex items-center justify-center hover:bg-secondary-container hover:border-secondary-container transition-colors group"
+              aria-label="Previous Testimonial"
+            >
+              <span className="material-symbols-outlined text-3xl text-on-background group-hover:text-background transition-colors">arrow_back</span>
+            </button>
+            <button 
+              onClick={() => handleManualScroll('right')}
+              className="w-14 h-14 bg-background border-4 border-background flex items-center justify-center hover:bg-secondary-container hover:border-secondary-container transition-colors group"
+              aria-label="Next Testimonial"
+            >
+              <span className="material-symbols-outlined text-3xl text-on-background group-hover:text-background transition-colors">arrow_forward</span>
+            </button>
+          </div>
         </div>
       </div>
       
