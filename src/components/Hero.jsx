@@ -265,56 +265,29 @@ export default function Hero() {
       window.removeEventListener("deviceorientation", handleOrientation);
       if (pointerRaf) cancelAnimationFrame(pointerRaf);
       if (gyroRaf) cancelAnimationFrame(gyroRaf);
-    };
+    return () => window.removeEventListener("pointermove", handlePointerMove);
   }, []);
 
   useLenis(({ scroll }) => {
     if (!heroRef.current) return;
-    const top = heroRef.current.offsetTop;
-    const rectTop = top - scroll;
+    const rect = heroRef.current.getBoundingClientRect();
     let progress = 0;
-    if (rectTop <= 0) {
-      progress = Math.max(0, Math.min(5, -rectTop / windowHeight));
+    if (rect.top <= 0) {
+      const viewportHeight = rect.height / 5;
+      progress = Math.max(0, Math.min(5, -rect.top / viewportHeight));
     }
-    
-    const t1 = Math.max(0, Math.min(1, progress));
-    const t2 = Math.max(0, Math.min(1, progress - 1.2));
-    
-    const b1Y = -t1 * 50;
-    const b1Opacity = 1 - t1;
-    
-    const b2Y = t1 < 1 ? (1 - t1) * 100 : -t2 * 50;
-    const b2Opacity = t1 < 1 ? t1 : (1 - t2);
-    
-    const b3Y = (1 - t2) * 100;
-    const b3Opacity = t2;
-    
-    const rp = Math.max(0, Math.min(1, (progress - 2.2) / 2.3));
-    const maxScroll = window.innerWidth < 768 ? 650 : 600;
-    const isy = -rp * maxScroll;
-    
-    const h = heroRef.current.style;
-    h.setProperty('--sp', progress);
-    h.setProperty('--b1-y', b1Y + 'vh');
-    h.setProperty('--b1-o', b1Opacity);
-    h.setProperty('--b2-y', b2Y + 'vh');
-    h.setProperty('--b2-o', b2Opacity);
-    h.setProperty('--b3-y', b3Y + 'vh');
-    h.setProperty('--b3-o', b3Opacity);
-    h.setProperty('--isy', isy + 'px');
-    h.setProperty('--rp', rp);
-    h.setProperty('--rp-pct', 100 - (rp * 100));
+    setScrollProgress(progress);
 
-    if (b1Ref.current) b1Ref.current.style.pointerEvents = progress < 0.8 ? 'auto' : 'none';
-    if (b2Ref.current) b2Ref.current.style.pointerEvents = (progress > 0.2 && progress < 2.0) ? 'auto' : 'none';
-    if (b3Ref.current) b3Ref.current.style.pointerEvents = progress > 1.8 ? 'auto' : 'none';
-
+    const e1 = Math.max(0, Math.min(1, progress));
+    const e2 = Math.max(0, Math.min(1, progress - 1.2));
+    
     if (progress > 0.4 && !bulbSwingingRef.current) {
        bulbSwingingRef.current = true;
        setIsBulbSwinging(true);
     }
 
     let step = 0;
+    const rp = Math.max(0, Math.min(1, (progress - 2.2) / 2.3));
     if (rp >= 0.85) step = 4;
     else if (rp >= 0.67) step = 3;
     else if (rp >= 0.40) step = 2;
@@ -326,12 +299,31 @@ export default function Hero() {
     }
   });
 
+  const e1 = Math.max(0, Math.min(1, scrollProgress));
+  const e2 = Math.max(0, Math.min(1, scrollProgress - 1.2));
+  
+  const b1Y = -e1 * 50;
+  const b1Opacity = 1 - e1;
+  const b1Transform = `translate3d(0, ${b1Y}dvh, 0)`;
+
+  const b2YEnter = (1 - e1) * 100;
+  const b2YExit  = -e2 * 50;
+  const b2Y = e1 < 1 ? b2YEnter : b2YExit;
+  const b2Opacity = e1 < 1 ? e1 : (1 - e2);
+  const b2Transform = `translate3d(0, ${b2Y}dvh, 0)`;
+
+  const b3Y = (1 - e2) * 100;
+  const b3Opacity = e2;
+  const b3Transform = `translate3d(0, ${b3Y}dvh, 0)`;
+  
+  const rp = Math.max(0, Math.min(1, (scrollProgress - 2.2) / 2.3));
+  const maxScroll = typeof window !== 'undefined' && window.innerWidth < 768 ? 650 : 600;
+  const isy = -rp * maxScroll;
+
   return (
-    <section ref={heroRef} className="relative h-[500vh] w-full">
-      {/* perspective-origin on the sticky viewport gives the cylinder its vanishing point */}
-      <div className="sticky top-[90px] md:top-[110px] h-[calc(100vh-90px)] md:h-[calc(100vh-110px)] w-full overflow-hidden" style={{ overflow: 'clip' }}>
+    <section ref={heroRef} className="relative h-[500dvh] w-full">
+      <div className="sticky top-[90px] md:top-[110px] h-[calc(100dvh-90px)] md:h-[calc(100dvh-110px)] w-full overflow-hidden" style={{ overflow: 'clip' }}>
         <div className="absolute inset-0 bg-grid-pattern opacity-100 pointer-events-none z-0"></div>
-        {/* Warpy Grid Layer tracking the mouse */}
         <div 
           className="absolute inset-0 bg-grid-pattern opacity-100 pointer-events-none z-0"
           style={{
@@ -341,37 +333,35 @@ export default function Hero() {
             maskImage: `radial-gradient(circle 250px at var(--cx, -1000px) var(--cy, -1000px), black 30%, transparent 100%)`,
           }}
         ></div>
+        
         {/* --- BLOCK 1: INTRO --- */}
         <div 
-          ref={b1Ref}
           className="absolute inset-0 flex flex-col justify-center px-margin-mobile md:px-margin-desktop"
           style={{ 
-            transform: 'translate3d(0, var(--b1-y), 0)', 
-            opacity: 'var(--b1-o)',
+            transform: b1Transform, 
+            opacity: b1Opacity,
+            pointerEvents: scrollProgress < 0.8 ? 'auto' : 'none',
             willChange: 'transform, opacity'
           }}
         >
-          {/* Background Elements */}
           <div 
-            className="absolute top-20 right-10 md:right-32 w-32 h-32 bg-primary-container border-4 border-on-background rounded-full mix-blend-multiply opacity-50 blur-3xl animate-pulse transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * 40px), calc(var(--my, 0) * 40px + $calc(var(--sp) * 200px)), 0)` }}
+            className="absolute top-20 right-10 md:right-32 w-32 h-32 bg-primary-container border-4 border-on-background rounded-full mix-blend-multiply opacity-50 blur-3xl animate-pulse"
+            style={{ transform: `translate3d(calc(var(--mx, 0) * 40px), calc(var(--my, 0) * 40px), 0)` }}
           ></div>
           <div 
-            className="absolute bottom-20 left-10 md:left-32 w-48 h-48 bg-secondary-container border-4 border-on-background mix-blend-multiply opacity-40 blur-2xl animate-pulse delay-1000 transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * 60px), calc(var(--my, 0) * 60px + $calc(var(--sp) * 150px)), 0)` }}
+            className="absolute bottom-20 left-10 md:left-32 w-48 h-48 bg-secondary-container border-4 border-on-background mix-blend-multiply opacity-40 blur-2xl animate-pulse delay-1000"
+            style={{ transform: `translate3d(calc(var(--mx, 0) * 60px), calc(var(--my, 0) * 60px), 0)` }}
           ></div>
           
-          {/* Experience Ribbon */}
           <div 
-            className="absolute top-2 md:top-10 left-2 md:left-4 bg-secondary-container text-on-secondary border-4 border-on-background py-1 px-4 md:py-2 md:px-8 -rotate-6 neo-shadow z-10 w-auto transition-transform duration-200 ease-out"
+            className="absolute top-2 md:top-10 left-2 md:left-4 bg-secondary-container text-on-secondary border-4 border-on-background py-1 px-4 md:py-2 md:px-8 -rotate-6 neo-shadow z-10 w-auto"
             style={{ transform: `translate3d(calc(var(--mx, 0) * -20px), calc(var(--my, 0) * -20px), 0) rotate(-6deg)` }}
           >
             <span className="font-label-mono text-[10px] md:text-label-mono uppercase whitespace-nowrap">6+ YEARS OF EDITING &amp; BUILDING</span>
           </div>
           
-          {/* Floating Sticker */}
           <div 
-            className="absolute top-10 right-2 md:right-4 bg-background border-4 border-on-background py-3 px-6 rotate-12 neo-shadow z-10 hidden md:block transition-transform duration-200 ease-out"
+            className="absolute top-10 right-2 md:right-4 bg-background border-4 border-on-background py-3 px-6 rotate-12 neo-shadow z-10 hidden md:block"
             style={{ transform: `translate3d(calc(var(--mx, 0) * -15px), calc(var(--my, 0) * -15px), 0) rotate(12deg)` }}
           >
             <span className="font-label-mono text-label-mono uppercase flex items-center gap-2">
@@ -380,9 +370,8 @@ export default function Hero() {
             </span>
           </div>
 
-          {/* Main Content */}
           <div 
-            className="relative z-20 max-w-5xl mx-auto text-center md:text-left transition-transform duration-200 ease-out mt-12 md:mt-24"
+            className="relative z-20 max-w-5xl mx-auto text-center md:text-left mt-12 md:mt-24"
             style={{ transform: `translate3d(calc(var(--mx, 0) * -30px), calc(var(--my, 0) * -30px), 0)` }}
           >
             <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-[1.1] md:leading-none mb-4 md:mb-8 tracking-tighter">
@@ -395,7 +384,6 @@ export default function Hero() {
               I build websites that break the grid and edit videos that move the needle. Punchy, fast, and unapologetically loud.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-8 md:gap-12 relative">
-              {/* CTA */}
               <button 
                 onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}
                 className="bg-primary-container text-on-background border-4 border-on-background px-10 py-5 font-headline-md text-headline-md uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2 w-full sm:w-auto relative group"
@@ -406,32 +394,19 @@ export default function Hero() {
                 </span>
                 <div className="absolute inset-0 bg-dots opacity-20"></div>
               </button>
-              {/* Doodle Arrow */}
               <div className="hidden md:block w-32 h-16 border-t-4 border-r-4 border-cobalt rounded-tr-full -ml-8 mt-12 opacity-80"></div>
             </div>
           </div>
 
-          {/* Tool Logos Scattered to Extreme Edges */}
-          <div 
-            className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-[400ms] md:duration-200 ease-out opacity-60 md:opacity-100"
-            style={{ transform: `translate3d(0, $calc(var(--sp) * 120px), 0)` }}
-          >
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-60 md:opacity-100">
             <FloatingLogo bg="bg-[#f7df1e]" color="text-black" icon={<SiJavascript className="w-8 h-8 md:w-12 md:h-12" />} rotate="-rotate-[15deg]" positionClasses="top-[5%] md:top-[8%] left-[2%] md:left-[5%]" parallaxSpeed={40} />
-            
             <FloatingLogo bg="bg-[#282c34]" color="text-[#61dafb]" icon={<SiReact className="w-8 h-8 md:w-12 md:h-12" />} rotate="rotate-[20deg]" positionClasses="top-[10%] md:top-[12%] right-[2%] md:right-[5%]" parallaxSpeed={-60} />
-            
             <FloatingLogo bg="bg-[#000000]" color="text-white" icon={<SiNextdotjs className="w-8 h-8 md:w-12 md:h-12" />} rotate="-rotate-6" positionClasses="bottom-[5%] md:bottom-[8%] right-[5%] md:right-[10%]" parallaxSpeed={25} />
-            
             <FloatingLogo bg="bg-[#00005b]" color="text-[#9999ff]" text="Ae" rotate="-rotate-[20deg]" positionClasses="top-[5%] md:top-[8%] right-[25%] md:right-[35%]" parallaxSpeed={50} />
-            
             <FloatingLogo bg="bg-[#00005b]" color="text-[#ea77ff]" text="Pr" rotate="rotate-[25deg]" positionClasses="top-[65%] md:top-[70%] right-[5%] md:right-[15%]" parallaxSpeed={-70} />
-            
             <FloatingLogo bg="bg-white" color="text-[#38bdf8]" icon={<SiTailwindcss className="w-8 h-8 md:w-12 md:h-12" />} rotate="rotate-[15deg]" positionClasses="top-[45%] md:top-[50%] right-[2%] md:right-[5%]" parallaxSpeed={-35} />
-            
             <FloatingLogo bg="bg-white" color="text-[#339933]" icon={<SiNodedotjs className="w-8 h-8 md:w-12 md:h-12" />} rotate="rotate-12" positionClasses="top-[30%] md:top-[40%] left-[5%] md:left-[8%]" parallaxSpeed={-20} />
-            
             <FloatingLogo bg="bg-black" color="text-white" icon={<FigmaLogo className="w-8 h-8 md:w-12 md:h-12" />} rotate="-rotate-12" positionClasses="bottom-[10%] md:bottom-[15%] left-[3%] md:left-[8%] hidden md:block" parallaxSpeed={55} />
-
             <div className="absolute top-[15%] left-[50%] bg-dots w-16 h-16 rounded-full border-2 border-on-background opacity-50 hidden md:block"></div>
             <span className="absolute top-[5%] right-[30%] text-cobalt material-symbols-outlined text-4xl rotate-12 hidden md:inline-block">bolt</span>
           </div>
@@ -439,25 +414,23 @@ export default function Hero() {
 
         {/* --- BLOCK 2: IMPACT STATEMENT --- */}
         <div 
-          ref={b2Ref}
           className="absolute inset-0 flex flex-col justify-center items-center text-center px-margin-mobile md:px-margin-desktop"
           style={{ 
-            transform: 'translate3d(0, var(--b2-y), 0)', 
-            opacity: 'var(--b2-o)',
+            transform: b2Transform, 
+            opacity: b2Opacity,
+            pointerEvents: (scrollProgress > 0.2 && scrollProgress < 2.0) ? 'auto' : 'none',
             willChange: 'transform, opacity'
           }}
         >
-          {/* New Background Elements */}
           <div 
-            className="absolute top-1/4 left-1/4 w-64 h-64 bg-cobalt border-4 border-on-background rounded-full mix-blend-multiply opacity-30 blur-3xl animate-pulse transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * 60px), calc(var(--my, 0) * 60px + $calc(var(--sp) * 180px)), 0)` }}
+            className="absolute top-1/4 left-1/4 w-64 h-64 bg-cobalt border-4 border-on-background rounded-full mix-blend-multiply opacity-30 blur-3xl animate-pulse"
+            style={{ transform: `translate3d(calc(var(--mx, 0) * 60px), calc(var(--my, 0) * 60px), 0)` }}
           ></div>
           <div 
-            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-container border-4 border-on-background mix-blend-multiply opacity-20 blur-3xl animate-pulse delay-700 transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * -60px), calc(var(--my, 0) * -60px + $calc(var(--sp) * 130px)), 0)` }}
+            className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-container border-4 border-on-background mix-blend-multiply opacity-20 blur-3xl animate-pulse delay-700"
+            style={{ transform: `translate3d(calc(var(--mx, 0) * -60px), calc(var(--my, 0) * -60px), 0)` }}
           ></div>
 
-          {/* Swinging Lightbulb */}
           {isBulbSwinging && (
             <div className="absolute top-0 left-[5%] md:left-[10%] origin-top animate-[bulb-swing_2.5s_ease-in-out_forwards] z-40 pointer-events-none" style={{ transformOrigin: 'top center' }}>
               <div 
@@ -469,35 +442,29 @@ export default function Hero() {
                 onMouseEnter={handleBulbHit}
                 onClick={handleBulbHit}
               >
-                {/* Wire */}
                 <div className="w-2 bg-on-background h-48 md:h-[350px] mx-auto shadow-[4px_0_0_0_#1b1c15]"></div>
-                {/* Socket */}
                 <div className="w-6 h-6 md:w-8 md:h-8 border-4 border-on-background bg-surface-variant mx-auto -mt-1 relative z-20 shadow-[4px_4px_0_0_#1b1c15] flex flex-col justify-evenly">
                   <div className="w-full h-[2px] bg-on-background opacity-40"></div>
                   <div className="w-full h-[2px] bg-on-background opacity-40"></div>
                 </div>
-                {/* Glass Bulb */}
                 <div className="w-10 h-10 md:w-16 md:h-16 border-4 border-on-background rounded-full mx-auto -mt-2 relative flex flex-col items-center justify-center bg-surface-container-high shadow-[4px_4px_0_0_#1b1c15] animate-[bulb-glow_0.1s_linear_2.2s_forwards] overflow-hidden">
-                  {/* Filament */}
                   <div className="w-4 h-4 md:w-6 md:h-6 border-4 border-on-background rounded-t-full border-b-0 absolute bottom-1 md:bottom-2 opacity-80"></div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Floating Impact Words */}
           <div 
-            className="absolute inset-0 pointer-events-none transition-transform duration-200 ease-out opacity-30 md:opacity-100 scale-75 md:scale-100"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * 80px), calc(var(--my, 0) * 80px + $calc(var(--sp) * 80px)), 0)` }}
+            className="absolute inset-0 pointer-events-none opacity-30 md:opacity-100 scale-75 md:scale-100"
+            style={{ transform: `translate3d(calc(var(--mx, 0) * 80px), calc(var(--my, 0) * 80px), 0)` }}
           >
             <span className="absolute top-[5%] md:top-[15%] right-[5%] md:right-[15%] bg-cobalt text-on-primary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-6 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">FAST</span>
             <span className="absolute bottom-[10%] md:bottom-[20%] left-[5%] md:left-[10%] bg-secondary-container text-on-secondary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase -rotate-12 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">KINETIC</span>
             <span className="absolute top-[80%] md:top-[40%] left-[10%] md:left-[5%] bg-primary-container text-on-background border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-3 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">LOUD</span>
           </div>
 
-          {/* Content */}
           <div 
-            className="relative z-20 max-w-4xl mx-auto transition-transform duration-200 ease-out"
+            className="relative z-20 max-w-4xl mx-auto"
             style={{ transform: `translate3d(calc(var(--mx, 0) * -40px), calc(var(--my, 0) * -40px), 0)` }}
           >
             <h2 className="font-display-xl text-headline-lg-mobile md:text-display-xl uppercase leading-none mb-6">
@@ -505,9 +472,7 @@ export default function Hero() {
               <span className="bg-on-background text-background px-4 inline-block -rotate-1 mt-2">ANOTHER TEMPLATE.</span>
             </h2>
 
-            {/* Windows 98/XP Dialog Box */}
             <div className="max-w-2xl mx-auto" style={{ fontFamily: 'Tahoma, Arial, sans-serif', filter: 'drop-shadow(6px 6px 0 #000)' }}>
-              {/* Title Bar */}
               <div suppressHydrationWarning style={{
                 background: 'linear-gradient(to right, #0a246a, #a6c9f7)',
                 padding: '3px 4px',
@@ -517,11 +482,9 @@ export default function Hero() {
                 userSelect: 'none',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  {/* Tiny icon */}
                   <div style={{ width: 14, height: 14, background: '#ffcc00', border: '1px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9 }}>⚡</div>
                   <span style={{ color: '#fff', fontWeight: 'bold', fontSize: 11, letterSpacing: 0.2 }}>impact.exe</span>
                 </div>
-                {/* Win buttons */}
                 <div style={{ display: 'flex', gap: 2 }}>
                   {['_','□','✕'].map((btn, i) => (
                     <div key={i} style={{
@@ -535,14 +498,12 @@ export default function Hero() {
                   ))}
                 </div>
               </div>
-              {/* Window body */}
               <div style={{
                 background: '#d4d0c8',
                 border: '2px solid',
                 borderColor: '#fff #808080 #808080 #fff',
                 padding: '12px 16px 16px',
               }}>
-                {/* Toolbar */}
                 <div style={{
                   background: '#d4d0c8',
                   borderBottom: '1px solid #808080',
@@ -555,7 +516,6 @@ export default function Hero() {
                     <span key={m} style={{ fontSize: 11, cursor: 'default', padding: '1px 4px' }}>{m}</span>
                   ))}
                 </div>
-                {/* Content area — inset sunken panel */}
                 <div style={{
                   background: '#fff',
                   border: '2px solid',
@@ -572,7 +532,6 @@ export default function Hero() {
                     <strong style={{ color: '#c03535' }}>No noise. Just signal.</strong>
                   </p>
                 </div>
-                {/* Status bar */}
                 <div style={{
                   marginTop: 8,
                   borderTop: '1px solid #808080',
@@ -593,20 +552,18 @@ export default function Hero() {
 
         {/* --- BLOCK 3: ROADMAP / FLOW --- */}
         <div 
-          ref={b3Ref}
           className="absolute inset-0 flex flex-col justify-start items-center text-left pt-24 md:pt-32 px-margin-mobile md:px-margin-desktop"
           style={{ 
-            transform: 'translate3d(0, var(--b3-y), 0)', 
-            opacity: 'var(--b3-o)',
+            transform: b3Transform, 
+            opacity: b3Opacity,
+            pointerEvents: scrollProgress > 1.8 ? 'auto' : 'none',
             willChange: 'transform, opacity'
           }}
         >
-          {/* Scattered Retro Mario Elements (Multi-Layer Parallax) */}
           <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-            {/* Layer 1 (Deepest, Slowest) */}
             <div 
               className="absolute inset-0 opacity-30 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate3d(calc(var(--mx, 0) * -2px), calc(var(--my, 0) * -2px), 0) translateY($calc(var(--isy) * 0.1))` }}
+              style={{ transform: `translate3d(calc(var(--mx, 0) * -2px), calc(var(--my, 0) * -2px), 0) translateY(${isy * 0.1}px)` }}
             >
               <div className="absolute top-[10%] left-[15%] -rotate-12 scale-75"><MarioPipe /></div>
               <div className="absolute top-[35%] right-[25%] rotate-[25deg] scale-50"><MarioCoin /></div>
@@ -617,7 +574,7 @@ export default function Hero() {
             {/* Layer 2 (Middle Depth) */}
             <div 
               className="absolute inset-0 opacity-50 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate3d(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -4px), 0) translateY($calc(var(--isy) * 0.25))` }}
+              style={{ transform: `translate3d(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -4px), 0) translateY(${isy * 0.25}px)` }}
             >
               <div className="absolute top-[5%] left-[30%] rotate-6 scale-90"><MarioCoin /></div>
               <div className="absolute top-[45%] right-[8%] -rotate-[15deg] scale-100"><MarioPipe /></div>
@@ -628,7 +585,7 @@ export default function Hero() {
             {/* Layer 3 (Closest Background, Fastest) */}
             <div 
               className="absolute inset-0 opacity-80 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate3d(calc(var(--mx, 0) * -7px), calc(var(--my, 0) * -7px), 0) translateY($calc(var(--isy) * 0.45))` }}
+              style={{ transform: `translate3d(calc(var(--mx, 0) * -7px), calc(var(--my, 0) * -7px), 0) translateY(${isy * 0.45}px)` }}
             >
               <div className="absolute top-[15%] right-[15%] rotate-12 scale-110"><MarioQuestion /></div>
               <div className="absolute top-[28%] left-[5%] -rotate-12 scale-125"><MarioBrick /></div>
@@ -638,7 +595,7 @@ export default function Hero() {
           </div>
 
           <div className="relative z-20 w-full max-w-6xl mx-auto transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * -20px), calc(var(--my, 0) * -20px), 0) translateY($var(--isy))` }}>
+            style={{ transform: `translate3d(calc(var(--mx, 0) * -20px), calc(var(--my, 0) * -20px), 0) translateY(${isy}px)` }}>
             
             <h2 className="font-display-xl text-headline-lg-mobile md:text-display-xl uppercase leading-none mb-2 text-center">
               HOW I <span className="bg-primary-container text-on-background px-4 py-1 inline-block -rotate-2 border-[4px] border-on-background shadow-[4px_4px_0_0_#1b1c15] md:shadow-[8px_8px_0_0_#1b1c15]">WORK</span>
@@ -666,7 +623,7 @@ export default function Hero() {
                   vectorEffect="non-scaling-stroke" 
                   pathLength="100"
                   strokeDasharray="100"
-                  strokeDashoffset="var(--rp-pct)"
+                  strokeDashoffset={100 - rp * 100}
                   className="transition-all duration-75 drop-shadow-[0_0_8px_var(--color-cobalt)]"
                 />
               </svg>
