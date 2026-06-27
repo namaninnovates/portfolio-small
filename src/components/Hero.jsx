@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useLenis } from 'lenis/react';
 import { SiJavascript, SiReact, SiNextdotjs, SiTailwindcss, SiNodedotjs, SiFigma } from "react-icons/si";
 
 // --- Mario Retro Elements ---
@@ -200,21 +201,6 @@ export default function Hero() {
     setWindowHeight(window.innerHeight);
     const handleResize = () => setWindowHeight(window.innerHeight);
     window.addEventListener("resize", handleResize);
-
-    let scrollRaf;
-    const handleScroll = () => {
-      if (!heroRef.current) return;
-      if (scrollRaf) cancelAnimationFrame(scrollRaf);
-      scrollRaf = requestAnimationFrame(() => {
-        const rect = heroRef.current.getBoundingClientRect();
-        let progress = 0;
-        if (rect.top <= 0) {
-          // max progress is 4 for a 500vh container (400vh of scrolling before exit)
-          progress = Math.max(0, Math.min(5, -rect.top / window.innerHeight));
-        }
-        setScrollProgress(progress);
-      });
-    };
     
     let pointerRaf;
     const handlePointerMove = (e) => {
@@ -254,21 +240,27 @@ export default function Hero() {
       });
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("deviceorientation", handleOrientation);
-    handleScroll(); // initialize
     
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("deviceorientation", handleOrientation);
-      if (scrollRaf) cancelAnimationFrame(scrollRaf);
       if (pointerRaf) cancelAnimationFrame(pointerRaf);
       if (gyroRaf) cancelAnimationFrame(gyroRaf);
     };
   }, []);
+
+  useLenis(({ scroll }) => {
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    let progress = 0;
+    if (rect.top <= 0) {
+      progress = Math.max(0, Math.min(5, -rect.top / window.innerHeight));
+    }
+    setScrollProgress(progress);
+  });
 
   // ============================================================
   // PARALLAX SCROLL SYSTEM
