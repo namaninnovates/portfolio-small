@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { SiJavascript, SiReact, SiNextdotjs, SiTailwindcss, SiNodedotjs, SiFigma } from "react-icons/si";
 
 // --- Mario Retro Elements ---
 const MarioCoin = () => (
@@ -43,6 +44,142 @@ const MarioQuestion = () => (
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     fontWeight: 900, fontSize: 22, color: '#e89000', WebkitTextStroke: '1.5px #000', WebkitTextFillColor: '#e89000'
   }}>?</div>
+);
+
+// --- Pixel Art SVG Component ---
+const PixelIcon = ({ art, color, className = "" }) => {
+  const sizeX = art[0].length;
+  const sizeY = art.length;
+  return (
+    <svg 
+      viewBox={`0 0 ${sizeX} ${sizeY}`} 
+      className={className}
+      style={{ shapeRendering: 'crispEdges' }}
+    >
+      {art.map((row, y) => 
+        row.split('').map((cell, x) => {
+          if (cell === '.') return null;
+          let fill = color;
+          if (cell === 'X') fill = "#1b1c15";
+          else if (cell === 'W') fill = "#ffffff";
+          else if (cell === 'O') fill = "#d43f00";
+          else if (cell === 'Y') fill = "#ffcc00";
+          else if (cell === 'R') fill = "#f24e1e";
+          else if (cell === 'F') fill = "#ff7262";
+          else if (cell === 'P') fill = "#a259ff";
+          else if (cell === 'B') fill = "#1abc9c";
+          else if (cell === 'G') fill = "#0acf83";
+          else if (cell === 'T') fill = "#38bdf8";
+          else if (cell === 'A') fill = "#61dafb";
+          else if (cell === 'D') fill = "#00005b";
+          else if (cell === 'E') fill = "#e23237";
+          else if (cell === 'C') fill = color;
+          else return null;
+          
+          return <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill={fill} />;
+        })
+      )}
+    </svg>
+  );
+};
+
+const coffeeArt = [
+  "................",
+  ".....X...X......",
+  "....X...X.......",
+  ".....X...X......",
+  "................",
+  "....XXXXXXXX....",
+  "...XCCCCCCCCX...",
+  "...XCCCCCCCCXX..",
+  "...XCCCCCCCCX.X.",
+  "...XCCCCCCCCXX..",
+  "...XCCCCCCCCX...",
+  "....XXXXXXXX....",
+  "...XCCCCCCCCX...",
+  "..XCCCCCCCCCCX..",
+  "..XXXXXXXXXXXX..",
+  "................"
+];
+
+const hammerArt = [
+  "..........XXX...",
+  ".........XCCCX..",
+  "........XCCCCCX.",
+  ".........XCCCX.X",
+  ".......XXXCCCXX.",
+  "......XCCXXXXX..",
+  ".....XCCX.......",
+  "....XCCX........",
+  "...XCCX.........",
+  "..XCCX..........",
+  "..XCCX..........",
+  "..XXXX..........",
+  "................",
+  "................",
+  "................",
+  "................"
+];
+
+const starArt = [
+  ".......XX.......",
+  "......XCCX......",
+  "......XCCX......",
+  ".....XCCCCX.....",
+  "XX..XCCCCCCX..XX",
+  ".XXXXCCCCCCXXXX.",
+  "..XCCCCCCCCCCX..",
+  "...XCCCXXCCCX...",
+  "...XCCCXXCCCX...",
+  "...XCCCCCCCCX...",
+  "...XCCCCCCCCX...",
+  "..XCCCX..XCCCX..",
+  "..XCCX....XCCX..",
+  ".XXXX......XXXX.",
+  "................",
+  "................"
+];
+
+const rocketArt = [
+  ".......XX.......",
+  "......XCCX......",
+  ".....XCCCCX.....",
+  ".....XCWWCX.....",
+  "....XCWWWWCX....",
+  "....XCWCCWCX....",
+  "...XCCCCCCCCX...",
+  "...XCCCCCCCCX...",
+  "..XCCCXXXXCCCX..",
+  "..XCCX.XX.XCCX..",
+  ".XCCX..XX..XCCX.",
+  ".XXX...XX...XXX.",
+  "......XYYX......",
+  ".....XOOOOX.....",
+  "......XXXX......",
+  "................"
+];
+
+// --- Tech Stack Logos ---
+const FloatingLogo = ({ bg, color, text, icon, rotate, positionClasses, parallaxSpeed, sizeClass = "w-14 h-14 md:w-20 md:h-20" }) => (
+  <div 
+    className={`absolute ${positionClasses} z-10 transition-transform duration-[400ms] md:duration-200 ease-out`}
+    style={{ transform: `translate3d(calc(var(--mx, 0) * ${parallaxSpeed}px), calc(var(--my, 0) * ${parallaxSpeed}px), 0)` }}
+  >
+    <div className={`flex items-center justify-center border-4 border-on-background shadow-[4px_4px_0_0_#1b1c15] md:shadow-[6px_6px_0_0_#1b1c15] ${bg} ${color} ${sizeClass} ${rotate}`}>
+      {text && <span className="font-sans font-bold tracking-tight text-3xl md:text-5xl leading-none">{text}</span>}
+      {icon && icon}
+    </div>
+  </div>
+);
+
+const FigmaLogo = ({ className }) => (
+  <svg viewBox="0 0 200 300" className={className}>
+    <path fill="#f24e1e" d="M0 50C0 22.4 22.4 0 50 0h50v100H50C22.4 100 0 77.6 0 50z"/>
+    <path fill="#ff7262" d="M100 0h50c27.6 0 50 22.4 50 50s-22.4 50-50 50h-50V0z"/>
+    <path fill="#a259ff" d="M0 150c0-27.6 22.4-50 50-50h50v100H50c-27.6 0-50-22.4-50-50z"/>
+    <path fill="#1abcfe" d="M200 150c0 27.6-22.4 50-50 50s-50-22.4-50-50 22.4-50 50-50 50 22.4 50 50z"/>
+    <path fill="#0acf83" d="M50 300c27.6 0 50-22.4 50-50v-50H50c-27.6 0-50 22.4-50 50s22.4 50 50 50z"/>
+  </svg>
 );
 
 export default function Hero() {
@@ -135,30 +272,28 @@ export default function Hero() {
 
   // ============================================================
   // PARALLAX SCROLL SYSTEM
-  // Exiting section drifts up slowly (-50vh)
-  // Entering section rushes up from further below (+100vh)
-  // The speed difference = parallax depth illusion
-  // Both fade simultaneously for clean crossfade
+  // Replaced non-linear easing with linear mapping to fix scroll jumping
+  // and make scrolling 1:1 responsive to user input.
   // ============================================================
-  const CROSS_DUR = 0.6;
-  const t1 = Math.max(0, Math.min(1, (scrollProgress - 0.5) / CROSS_DUR));
-  const t2 = Math.max(0, Math.min(1, (scrollProgress - 1.7) / CROSS_DUR));
+  // Block 1 to Block 2 transition (scrollProgress 0 to 1)
+  const t1 = Math.max(0, Math.min(1, scrollProgress)); 
+  // Block 2 to Block 3 transition (scrollProgress 1.2 to 2.2)
+  const t2 = Math.max(0, Math.min(1, scrollProgress - 1.2)); 
 
-  // Easing for organic feel
-  const ease = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-  const e1 = ease(t1);
-  const e2 = ease(t2);
+  // Linear easing for responsive 1:1 scroll feel
+  const e1 = t1;
+  const e2 = t2;
 
   // --- BLOCK 1: drifts up & fades out ---
-  const b1Y = -e1 * 50;       // 0 → -50vh (slow drift, not a full push)
+  const b1Y = -e1 * 50;       // 0 → -50vh
   const b1Opacity = 1 - e1;
   const b1Transform = `translate3d(0, ${b1Y}vh, 0)`;
 
   // --- BLOCK 2: rushes up from below & fades in, then drifts away ---
-  const b2YEnter = (1 - e1) * 100;   // 100vh → 0 (faster entry from deeper below)
-  const b2YExit  = -e2 * 50;          // 0 → -50vh (same slow drift on exit)
+  const b2YEnter = (1 - e1) * 100;   // 100vh → 0
+  const b2YExit  = -e2 * 50;          // 0 → -50vh
   const b2Y = t1 < 1 ? b2YEnter : b2YExit;
-  const b2Opacity = Math.max(0, Math.min(1, Math.min(e1, 1 - e2)));
+  const b2Opacity = t1 < 1 ? e1 : (1 - e2);
   const b2Transform = `translate3d(0, ${b2Y}vh, 0)`;
 
   // --- BLOCK 3: rushes up from below & fades in, locks ---
@@ -166,17 +301,17 @@ export default function Hero() {
   const b3Opacity = e2;
   const b3Transform = `translate3d(0, ${b3Y}vh, 0)`;
 
-  // Roadmap scroll: starts at 2.3, runs until 4.0
-  const roadmapProgress = Math.max(0, Math.min(1, (scrollProgress - 2.3) / 1.7));
+  // Roadmap scroll: starts at 2.2, runs until 4.5
+  const roadmapProgress = Math.max(0, Math.min(1, (scrollProgress - 2.2) / 2.3));
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const maxScroll = isMobile ? 650 : 500;
+  const maxScroll = isMobile ? 650 : 600;
   const innerScrollY = -roadmapProgress * maxScroll;
 
   return (
     <section ref={heroRef} className="relative h-[500vh] w-full">
       {/* perspective-origin on the sticky viewport gives the cylinder its vanishing point */}
       <div className="sticky top-[90px] md:top-[110px] h-[calc(100vh-90px)] md:h-[calc(100vh-110px)] w-full overflow-hidden" style={{ overflow: 'clip' }}>
-        <div className="absolute inset-0 bg-grid-pattern opacity-50 pointer-events-none z-0"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-100 pointer-events-none z-0"></div>
         {/* Warpy Grid Layer tracking the mouse */}
         <div 
           className="absolute inset-0 bg-grid-pattern opacity-100 pointer-events-none z-0"
@@ -194,7 +329,7 @@ export default function Hero() {
             transform: b1Transform, 
             opacity: b1Opacity,
             transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
-            pointerEvents: scrollProgress < 0.5 ? 'auto' : 'none',
+            pointerEvents: scrollProgress < 0.8 ? 'auto' : 'none',
             willChange: 'transform, opacity'
           }}
         >
@@ -235,7 +370,7 @@ export default function Hero() {
             <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-[1.1] md:leading-none mb-4 md:mb-8 tracking-tighter">
               <span className="block md:-ml-2 hover:ml-2 transition-all duration-300"><span className="text-cobalt">CREATIVE</span> <span className="text-primary-container drop-shadow-[4px_4px_0_#1b1c15] md:drop-shadow-[8px_8px_0_#1b1c15] stroke-on-background" style={{ WebkitTextStroke: '2px #1b1c15' }}>BY DESIGN,</span></span>
               <span className="block md:ml-4 hover:-ml-2 transition-all duration-300">EDITOR <span className="bg-on-background text-background px-2 md:px-4 inline-block -rotate-2">BY CRAFT,</span></span>
-              <span className="block text-secondary-container hover:text-on-background transition-colors duration-300">DEV BY CHOICE</span>
+              <span className="block text-secondary-container">DEV BY CHOICE</span>
             </h1>
             <p className="font-body-sm md:font-body-lg text-sm md:text-body-lg max-w-2xl bg-background border-l-8 border-primary-container pl-4 md:pl-6 py-1 md:py-2 mb-6 md:mb-12 relative mx-auto md:mx-0">
               <span className="absolute -left-6 -top-6 text-5xl md:text-6xl text-on-background opacity-20 font-display-xl">&quot;</span>
@@ -243,7 +378,10 @@ export default function Hero() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-8 md:gap-12 relative">
               {/* CTA */}
-              <button className="bg-primary-container text-on-background border-4 border-on-background px-10 py-5 font-headline-md text-headline-md uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2 w-full sm:w-auto relative group">
+              <button 
+                onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}
+                className="bg-primary-container text-on-background border-4 border-on-background px-10 py-5 font-headline-md text-headline-md uppercase neo-shadow neo-shadow-hover transition-all duration-150 rotate-2 w-full sm:w-auto relative group"
+              >
                 <span className="relative z-10 flex items-center justify-center gap-4">
                   SEE MY WORK
                   <span className="material-symbols-outlined font-bold group-hover:translate-x-2 transition-transform">ads_click</span>
@@ -255,18 +393,27 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Tool Chips Scattered */}
+          {/* Tool Logos Scattered to Extreme Edges */}
           <div 
-            className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-[400ms] md:duration-200 ease-out opacity-60 md:opacity-100 scale-75 md:scale-100"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * 50px), calc(var(--my, 0) * 50px + ${scrollProgress * 120}px), 0)` }}
+            className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-[400ms] md:duration-200 ease-out opacity-60 md:opacity-100"
+            style={{ transform: `translate3d(0, ${scrollProgress * 120}px, 0)` }}
           >
-            <span className="absolute top-[8%] md:top-[20%] left-[5%] md:left-[20%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">data_object</span>JavaScript</span>
-            <span className="absolute top-[18%] md:top-[30%] right-[5%] md:right-[25%] bg-surface-container-high border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-12 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">science</span>React</span>
-            <span className="absolute bottom-[20%] md:bottom-[15%] left-[5%] bg-secondary-fixed-dim border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">animation</span>After Effects</span>
-            <span className="absolute bottom-[10%] md:bottom-auto md:top-[70%] right-[5%] bg-primary-container border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-6 neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">draw</span>Figma</span>
-            <span className="absolute bottom-[2%] md:bottom-[30%] left-[30%] md:left-[45%] bg-background border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[15deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">movie</span>Premiere Pro</span>
-            <span className="absolute top-[2%] md:top-[45%] right-[30%] md:right-auto md:left-[60%] bg-cobalt text-on-primary border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full rotate-[20deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">terminal</span>Next.js</span>
-            <span className="absolute bottom-[15%] md:bottom-[35%] right-[20%] md:right-[15%] bg-secondary-container text-on-secondary border-2 border-on-background px-4 py-1 font-label-mono text-label-mono rounded-full -rotate-[10deg] neo-shadow flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">water_drop</span>Tailwind CSS</span>
+            <FloatingLogo bg="bg-[#f7df1e]" color="text-black" icon={<SiJavascript className="w-8 h-8 md:w-12 md:h-12" />} rotate="-rotate-[15deg]" positionClasses="top-[5%] md:top-[8%] left-[2%] md:left-[5%]" parallaxSpeed={40} />
+            
+            <FloatingLogo bg="bg-[#282c34]" color="text-[#61dafb]" icon={<SiReact className="w-8 h-8 md:w-12 md:h-12" />} rotate="rotate-[20deg]" positionClasses="top-[10%] md:top-[12%] right-[2%] md:right-[5%]" parallaxSpeed={-60} />
+            
+            <FloatingLogo bg="bg-[#000000]" color="text-white" icon={<SiNextdotjs className="w-8 h-8 md:w-12 md:h-12" />} rotate="-rotate-6" positionClasses="bottom-[5%] md:bottom-[8%] right-[5%] md:right-[10%]" parallaxSpeed={25} />
+            
+            <FloatingLogo bg="bg-[#00005b]" color="text-[#9999ff]" text="Ae" rotate="-rotate-[20deg]" positionClasses="top-[5%] md:top-[8%] right-[25%] md:right-[35%]" parallaxSpeed={50} />
+            
+            <FloatingLogo bg="bg-[#00005b]" color="text-[#ea77ff]" text="Pr" rotate="rotate-[25deg]" positionClasses="top-[65%] md:top-[70%] right-[5%] md:right-[15%]" parallaxSpeed={-70} />
+            
+            <FloatingLogo bg="bg-white" color="text-[#38bdf8]" icon={<SiTailwindcss className="w-8 h-8 md:w-12 md:h-12" />} rotate="rotate-[15deg]" positionClasses="top-[45%] md:top-[50%] right-[2%] md:right-[5%]" parallaxSpeed={-35} />
+            
+            <FloatingLogo bg="bg-white" color="text-[#339933]" icon={<SiNodedotjs className="w-8 h-8 md:w-12 md:h-12" />} rotate="rotate-12" positionClasses="top-[30%] md:top-[40%] left-[5%] md:left-[8%]" parallaxSpeed={-20} />
+            
+            <FloatingLogo bg="bg-black" color="text-white" icon={<FigmaLogo className="w-8 h-8 md:w-12 md:h-12" />} rotate="-rotate-12" positionClasses="bottom-[10%] md:bottom-[15%] left-[3%] md:left-[8%] hidden md:block" parallaxSpeed={55} />
+
             <div className="absolute top-[15%] left-[50%] bg-dots w-16 h-16 rounded-full border-2 border-on-background opacity-50 hidden md:block"></div>
             <span className="absolute top-[5%] right-[30%] text-cobalt material-symbols-outlined text-4xl rotate-12 hidden md:inline-block">bolt</span>
           </div>
@@ -279,7 +426,7 @@ export default function Hero() {
             transform: b2Transform, 
             opacity: b2Opacity,
             transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
-            pointerEvents: (scrollProgress > 0.5 && scrollProgress < 1.7) ? 'auto' : 'none',
+            pointerEvents: (scrollProgress > 0.2 && scrollProgress < 2.0) ? 'auto' : 'none',
             willChange: 'transform, opacity'
           }}
         >
@@ -434,7 +581,7 @@ export default function Hero() {
             transform: b3Transform, 
             opacity: b3Opacity,
             transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
-            pointerEvents: scrollProgress > 2.3 ? 'auto' : 'none',
+            pointerEvents: scrollProgress > 1.8 ? 'auto' : 'none',
             willChange: 'transform, opacity'
           }}
         >
@@ -510,10 +657,10 @@ export default function Hero() {
 
               {/* Extremely Scattered Roadmap Steps */}
               {[
-                { title: "The Brain Dump", icon: "☕", copy: "We hop on a call and you share your vision. I take detailed notes and promise not to judge your rough sketches.", activeAt: 0.13, top: "5%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
-                { title: "The Workshop", icon: "🛠️", copy: "I put my headphones on and get to work. Whether it's code, keyframes, or layouts, this is where the puzzle pieces start fitting together.", activeAt: 0.40, top: "28%", leftClasses: "left-[4%] md:left-12", rotate: "-rotate-3" },
-                { title: "The Polish", icon: "✨", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", activeAt: 0.67, top: "52%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
-                { title: "The Handoff", icon: "🚀", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", activeAt: 0.85, top: "76%", leftClasses: "left-[4%] md:left-1/4", rotate: "-rotate-6" }
+                { title: "The Brain Dump", icon: <PixelIcon art={coffeeArt} color="#ccff00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-cobalt text-on-primary", copy: "We hop on a call and you share your vision. I take detailed notes and promise not to judge your rough sketches.", activeAt: 0.13, top: "5%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
+                { title: "The Workshop", icon: <PixelIcon art={hammerArt} color="#ffffff" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-secondary text-on-secondary", copy: "I put my headphones on and get to work. Whether it's code, keyframes, or layouts, this is where the puzzle pieces start fitting together.", activeAt: 0.40, top: "27%", leftClasses: "left-[4%] md:left-12", rotate: "-rotate-3" },
+                { title: "The Polish", icon: <PixelIcon art={starArt} color="#ffcc00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-primary-container text-on-background", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", activeAt: 0.67, top: "50%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
+                { title: "The Handoff", icon: <PixelIcon art={rocketArt} color="#ccff00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-on-background text-background", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", activeAt: 0.85, top: "73%", leftClasses: "left-[4%] md:left-1/4", rotate: "-rotate-6" }
               ].map((step, idx) => {
                 const isActive = roadmapProgress >= step.activeAt;
                 return (
@@ -524,7 +671,9 @@ export default function Hero() {
                     {/* Content Box */}
                     <div className={`border-4 border-on-background p-3 md:p-6 transition-all duration-500 ease-out ${isActive ? 'bg-background neo-shadow opacity-100 scale-100' : 'bg-surface-container-high opacity-50 grayscale scale-[0.6] md:scale-75 blur-[1px] -translate-y-8'}`}>
                       <div className="flex items-center gap-3 md:gap-4 mb-2 border-b-4 border-on-background pb-2">
-                        <span className={`text-2xl md:text-4xl flex-shrink-0 bg-secondary text-on-secondary border-4 border-on-background w-12 h-12 md:w-16 md:h-16 flex items-center justify-center neo-shadow transition-transform duration-500 ${isActive ? '-rotate-12 scale-110' : 'rotate-0 scale-100'}`}>{step.icon}</span>
+                        <span className={`flex-shrink-0 ${step.bg} border-4 border-on-background w-12 h-12 md:w-16 md:h-16 flex items-center justify-center neo-shadow transition-transform duration-500 ${isActive ? '-rotate-12 scale-110' : 'rotate-0 scale-100'}`}>
+                          {step.icon}
+                        </span>
                         <h3 className="font-headline-md text-[16px] md:text-[26px] uppercase leading-tight">{step.title}</h3>
                       </div>
                       <p className="font-label-mono text-[12px] md:text-label-mono text-on-surface-variant pt-2">

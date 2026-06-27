@@ -1,6 +1,74 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+
+const LazyVideo = ({ src, trimStart, trimEnd, transform, className }) => {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+
+    el.defaultMuted = true;
+    el.muted = true;
+
+    if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              if (!el.getAttribute('src')) {
+                el.setAttribute('src', src);
+              }
+              // Add a small delay to prevent play/pause thrashing while scrolling fast
+              setTimeout(() => {
+                if (videoRef.current && !videoRef.current.paused === false) {
+                    const playPromise = el.play();
+                    if (playPromise !== undefined) {
+                        playPromise.catch(() => {});
+                    }
+                }
+              }, 50);
+            } else {
+              el.pause();
+            }
+          });
+        },
+        { rootMargin: '300px' }
+      );
+      observer.observe(el);
+
+      return () => {
+        observer.disconnect();
+      };
+    } else {
+      if (!el.getAttribute('src')) {
+        el.setAttribute('src', src);
+      }
+      el.play().catch(()=>{});
+    }
+  }, [src]);
+
+  return (
+    <video
+      ref={videoRef}
+      className={className}
+      style={{ transform }}
+      muted
+      loop={trimEnd === 0}
+      playsInline
+      preload="none"
+      onTimeUpdate={(e) => {
+        if (trimEnd > 0 && e.target.currentTime >= trimEnd) {
+          e.target.currentTime = trimStart || 0;
+          e.target.play().catch(()=>{});
+        } else if (trimStart > 0 && e.target.currentTime < trimStart) {
+          e.target.currentTime = trimStart;
+        }
+      }}
+    />
+  );
+};
 
 const getToolColor = (toolName) => {
   const t = toolName.trim().toLowerCase();
@@ -81,52 +149,12 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
                   return (
                     <div className="w-full h-full border-2 border-on-background overflow-hidden relative flex items-center justify-center bg-background">
                       {work.mediaType === 'video' ? (
-                        <video 
-                          className="w-full h-full object-contain transition-all duration-500 pointer-events-none" 
-                          data-src={src} 
-                          style={{ transform }}
-                          muted 
-                          loop={trimEnd === 0} 
-                          playsInline 
-                          preload="none"
-                          onTimeUpdate={(e) => {
-                            if (trimEnd > 0 && e.target.currentTime >= trimEnd) {
-                              e.target.currentTime = trimStart || 0;
-                              e.target.play().catch(()=>{});
-                            } else if (trimStart > 0 && e.target.currentTime < trimStart) {
-                              e.target.currentTime = trimStart;
-                            }
-                          }}
-                          ref={(el) => { 
-                            if (el) { 
-                              el.defaultMuted = true; 
-                              el.muted = true; 
-                              // Lazy load and play only when in viewport
-                              if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
-                                const observer = new IntersectionObserver(
-                                  (entries) => {
-                                    entries.forEach((entry) => {
-                                      if (entry.isIntersecting) {
-                                        if (!el.getAttribute('src')) {
-                                          el.setAttribute('src', el.getAttribute('data-src'));
-                                        }
-                                        el.play().catch(()=>{});
-                                      } else {
-                                        el.pause();
-                                      }
-                                    });
-                                  },
-                                  { rootMargin: '100px' }
-                                );
-                                observer.observe(el);
-                              } else {
-                                if (!el.getAttribute('src')) {
-                                  el.setAttribute('src', el.getAttribute('data-src'));
-                                }
-                                el.play().catch(()=>{});
-                              }
-                            } 
-                          }}
+                        <LazyVideo
+                          src={src}
+                          trimStart={trimStart}
+                          trimEnd={trimEnd}
+                          transform={transform}
+                          className="w-full h-full object-contain transition-all duration-500 pointer-events-none"
                         />
                       ) : (
                         <img 
