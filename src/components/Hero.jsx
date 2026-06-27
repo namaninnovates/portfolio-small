@@ -184,6 +184,7 @@ const FigmaLogo = ({ className }) => (
 );
 
 export default function Hero() {
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [windowHeight, setWindowHeight] = useState(1000);
   const [isBulbHit, setIsBulbHit] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -265,7 +266,7 @@ export default function Hero() {
       window.removeEventListener("deviceorientation", handleOrientation);
       if (pointerRaf) cancelAnimationFrame(pointerRaf);
       if (gyroRaf) cancelAnimationFrame(gyroRaf);
-    return () => window.removeEventListener("pointermove", handlePointerMove);
+    };
   }, []);
 
   useLenis(({ scroll }) => {
