@@ -184,12 +184,16 @@ const FigmaLogo = ({ className }) => (
 );
 
 export default function Hero() {
-  const [scrollProgress, setScrollProgress] = useState(0);
-  
-  
   const [windowHeight, setWindowHeight] = useState(1000);
   const [isBulbHit, setIsBulbHit] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
+  const [isBulbSwinging, setIsBulbSwinging] = useState(false);
   const heroRef = useRef(null);
+  const b1Ref = useRef(null);
+  const b2Ref = useRef(null);
+  const b3Ref = useRef(null);
+  const activeStepRef = useRef(0);
+  const bulbSwingingRef = useRef(false);
 
   const handleBulbHit = () => {
     if (isBulbHit) return;
@@ -242,7 +246,19 @@ export default function Hero() {
 
     window.addEventListener("pointermove", handlePointerMove);
     window.addEventListener("deviceorientation", handleOrientation);
-    
+    if (heroRef.current) {
+        const h = heroRef.current.style;
+        h.setProperty('--sp', 0);
+        h.setProperty('--b1-y', '0vh');
+        h.setProperty('--b1-o', 1);
+        h.setProperty('--b2-y', '100vh');
+        h.setProperty('--b2-o', 0);
+        h.setProperty('--b3-y', '100vh');
+        h.setProperty('--b3-o', 0);
+        h.setProperty('--isy', '0px');
+        h.setProperty('--rp', 0);
+        h.setProperty('--rp-pct', 100);
+    }
     return () => {
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("pointermove", handlePointerMove);
@@ -254,50 +270,61 @@ export default function Hero() {
 
   useLenis(({ scroll }) => {
     if (!heroRef.current) return;
-    const rect = heroRef.current.getBoundingClientRect();
+    const top = heroRef.current.offsetTop;
+    const rectTop = top - scroll;
     let progress = 0;
-    if (rect.top <= 0) {
-      progress = Math.max(0, Math.min(5, -rect.top / window.innerHeight));
+    if (rectTop <= 0) {
+      progress = Math.max(0, Math.min(5, -rectTop / windowHeight));
     }
-    setScrollProgress(progress);
+    
+    const t1 = Math.max(0, Math.min(1, progress));
+    const t2 = Math.max(0, Math.min(1, progress - 1.2));
+    
+    const b1Y = -t1 * 50;
+    const b1Opacity = 1 - t1;
+    
+    const b2Y = t1 < 1 ? (1 - t1) * 100 : -t2 * 50;
+    const b2Opacity = t1 < 1 ? t1 : (1 - t2);
+    
+    const b3Y = (1 - t2) * 100;
+    const b3Opacity = t2;
+    
+    const rp = Math.max(0, Math.min(1, (progress - 2.2) / 2.3));
+    const maxScroll = window.innerWidth < 768 ? 650 : 600;
+    const isy = -rp * maxScroll;
+    
+    const h = heroRef.current.style;
+    h.setProperty('--sp', progress);
+    h.setProperty('--b1-y', b1Y + 'vh');
+    h.setProperty('--b1-o', b1Opacity);
+    h.setProperty('--b2-y', b2Y + 'vh');
+    h.setProperty('--b2-o', b2Opacity);
+    h.setProperty('--b3-y', b3Y + 'vh');
+    h.setProperty('--b3-o', b3Opacity);
+    h.setProperty('--isy', isy + 'px');
+    h.setProperty('--rp', rp);
+    h.setProperty('--rp-pct', 100 - (rp * 100));
+
+    if (b1Ref.current) b1Ref.current.style.pointerEvents = progress < 0.8 ? 'auto' : 'none';
+    if (b2Ref.current) b2Ref.current.style.pointerEvents = (progress > 0.2 && progress < 2.0) ? 'auto' : 'none';
+    if (b3Ref.current) b3Ref.current.style.pointerEvents = progress > 1.8 ? 'auto' : 'none';
+
+    if (progress > 0.4 && !bulbSwingingRef.current) {
+       bulbSwingingRef.current = true;
+       setIsBulbSwinging(true);
+    }
+
+    let step = 0;
+    if (rp >= 0.85) step = 4;
+    else if (rp >= 0.67) step = 3;
+    else if (rp >= 0.40) step = 2;
+    else if (rp >= 0.13) step = 1;
+    
+    if (step !== activeStepRef.current) {
+      activeStepRef.current = step;
+      setActiveStep(step);
+    }
   });
-
-  // ============================================================
-  // PARALLAX SCROLL SYSTEM
-  // Replaced non-linear easing with linear mapping to fix scroll jumping
-  // and make scrolling 1:1 responsive to user input.
-  // ============================================================
-  // Block 1 to Block 2 transition (scrollProgress 0 to 1)
-  const t1 = Math.max(0, Math.min(1, scrollProgress)); 
-  // Block 2 to Block 3 transition (scrollProgress 1.2 to 2.2)
-  const t2 = Math.max(0, Math.min(1, scrollProgress - 1.2)); 
-
-  // Linear easing for responsive 1:1 scroll feel
-  const e1 = t1;
-  const e2 = t2;
-
-  // --- BLOCK 1: drifts up & fades out ---
-  const b1Y = -e1 * 50;       // 0 → -50vh
-  const b1Opacity = 1 - e1;
-  const b1Transform = `translate3d(0, ${b1Y}vh, 0)`;
-
-  // --- BLOCK 2: rushes up from below & fades in, then drifts away ---
-  const b2YEnter = (1 - e1) * 100;   // 100vh → 0
-  const b2YExit  = -e2 * 50;          // 0 → -50vh
-  const b2Y = t1 < 1 ? b2YEnter : b2YExit;
-  const b2Opacity = t1 < 1 ? e1 : (1 - e2);
-  const b2Transform = `translate3d(0, ${b2Y}vh, 0)`;
-
-  // --- BLOCK 3: rushes up from below & fades in, locks ---
-  const b3Y = (1 - e2) * 100;        // 100vh → 0
-  const b3Opacity = e2;
-  const b3Transform = `translate3d(0, ${b3Y}vh, 0)`;
-
-  // Roadmap scroll: starts at 2.2, runs until 4.5
-  const roadmapProgress = Math.max(0, Math.min(1, (scrollProgress - 2.2) / 2.3));
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const maxScroll = isMobile ? 650 : 600;
-  const innerScrollY = -roadmapProgress * maxScroll;
 
   return (
     <section ref={heroRef} className="relative h-[500vh] w-full">
@@ -316,23 +343,22 @@ export default function Hero() {
         ></div>
         {/* --- BLOCK 1: INTRO --- */}
         <div 
+          ref={b1Ref}
           className="absolute inset-0 flex flex-col justify-center px-margin-mobile md:px-margin-desktop"
           style={{ 
-            transform: b1Transform, 
-            opacity: b1Opacity,
-            transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
-            pointerEvents: scrollProgress < 0.8 ? 'auto' : 'none',
+            transform: 'translate3d(0, var(--b1-y), 0)', 
+            opacity: 'var(--b1-o)',
             willChange: 'transform, opacity'
           }}
         >
           {/* Background Elements */}
           <div 
             className="absolute top-20 right-10 md:right-32 w-32 h-32 bg-primary-container border-4 border-on-background rounded-full mix-blend-multiply opacity-50 blur-3xl animate-pulse transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * 40px), calc(var(--my, 0) * 40px + ${scrollProgress * 200}px), 0)` }}
+            style={{ transform: `translate3d(calc(var(--mx, 0) * 40px), calc(var(--my, 0) * 40px + $calc(var(--sp) * 200px)), 0)` }}
           ></div>
           <div 
             className="absolute bottom-20 left-10 md:left-32 w-48 h-48 bg-secondary-container border-4 border-on-background mix-blend-multiply opacity-40 blur-2xl animate-pulse delay-1000 transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * 60px), calc(var(--my, 0) * 60px + ${scrollProgress * 150}px), 0)` }}
+            style={{ transform: `translate3d(calc(var(--mx, 0) * 60px), calc(var(--my, 0) * 60px + $calc(var(--sp) * 150px)), 0)` }}
           ></div>
           
           {/* Experience Ribbon */}
@@ -388,7 +414,7 @@ export default function Hero() {
           {/* Tool Logos Scattered to Extreme Edges */}
           <div 
             className="absolute inset-0 pointer-events-none overflow-hidden z-0 transition-transform duration-[400ms] md:duration-200 ease-out opacity-60 md:opacity-100"
-            style={{ transform: `translate3d(0, ${scrollProgress * 120}px, 0)` }}
+            style={{ transform: `translate3d(0, $calc(var(--sp) * 120px), 0)` }}
           >
             <FloatingLogo bg="bg-[#f7df1e]" color="text-black" icon={<SiJavascript className="w-8 h-8 md:w-12 md:h-12" />} rotate="-rotate-[15deg]" positionClasses="top-[5%] md:top-[8%] left-[2%] md:left-[5%]" parallaxSpeed={40} />
             
@@ -413,27 +439,26 @@ export default function Hero() {
 
         {/* --- BLOCK 2: IMPACT STATEMENT --- */}
         <div 
+          ref={b2Ref}
           className="absolute inset-0 flex flex-col justify-center items-center text-center px-margin-mobile md:px-margin-desktop"
           style={{ 
-            transform: b2Transform, 
-            opacity: b2Opacity,
-            transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
-            pointerEvents: (scrollProgress > 0.2 && scrollProgress < 2.0) ? 'auto' : 'none',
+            transform: 'translate3d(0, var(--b2-y), 0)', 
+            opacity: 'var(--b2-o)',
             willChange: 'transform, opacity'
           }}
         >
           {/* New Background Elements */}
           <div 
             className="absolute top-1/4 left-1/4 w-64 h-64 bg-cobalt border-4 border-on-background rounded-full mix-blend-multiply opacity-30 blur-3xl animate-pulse transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * 60px), calc(var(--my, 0) * 60px + ${scrollProgress * 180}px), 0)` }}
+            style={{ transform: `translate3d(calc(var(--mx, 0) * 60px), calc(var(--my, 0) * 60px + $calc(var(--sp) * 180px)), 0)` }}
           ></div>
           <div 
             className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary-container border-4 border-on-background mix-blend-multiply opacity-20 blur-3xl animate-pulse delay-700 transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * -60px), calc(var(--my, 0) * -60px + ${scrollProgress * 130}px), 0)` }}
+            style={{ transform: `translate3d(calc(var(--mx, 0) * -60px), calc(var(--my, 0) * -60px + $calc(var(--sp) * 130px)), 0)` }}
           ></div>
 
           {/* Swinging Lightbulb */}
-          {scrollProgress > 0.4 && (
+          {isBulbSwinging && (
             <div className="absolute top-0 left-[5%] md:left-[10%] origin-top animate-[bulb-swing_2.5s_ease-in-out_forwards] z-40 pointer-events-none" style={{ transformOrigin: 'top center' }}>
               <div 
                 className="origin-top flex flex-col items-center cursor-pointer px-8 pointer-events-auto" 
@@ -463,7 +488,7 @@ export default function Hero() {
           {/* Floating Impact Words */}
           <div 
             className="absolute inset-0 pointer-events-none transition-transform duration-200 ease-out opacity-30 md:opacity-100 scale-75 md:scale-100"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * 80px), calc(var(--my, 0) * 80px + ${scrollProgress * 80}px), 0)` }}
+            style={{ transform: `translate3d(calc(var(--mx, 0) * 80px), calc(var(--my, 0) * 80px + $calc(var(--sp) * 80px)), 0)` }}
           >
             <span className="absolute top-[5%] md:top-[15%] right-[5%] md:right-[15%] bg-cobalt text-on-primary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-6 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">FAST</span>
             <span className="absolute bottom-[10%] md:bottom-[20%] left-[5%] md:left-[10%] bg-secondary-container text-on-secondary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase -rotate-12 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">KINETIC</span>
@@ -568,12 +593,11 @@ export default function Hero() {
 
         {/* --- BLOCK 3: ROADMAP / FLOW --- */}
         <div 
+          ref={b3Ref}
           className="absolute inset-0 flex flex-col justify-start items-center text-left pt-24 md:pt-32 px-margin-mobile md:px-margin-desktop"
           style={{ 
-            transform: b3Transform, 
-            opacity: b3Opacity,
-            transition: 'transform 0.08s ease-out, opacity 0.08s ease-out',
-            pointerEvents: scrollProgress > 1.8 ? 'auto' : 'none',
+            transform: 'translate3d(0, var(--b3-y), 0)', 
+            opacity: 'var(--b3-o)',
             willChange: 'transform, opacity'
           }}
         >
@@ -582,7 +606,7 @@ export default function Hero() {
             {/* Layer 1 (Deepest, Slowest) */}
             <div 
               className="absolute inset-0 opacity-30 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate3d(calc(var(--mx, 0) * -2px), calc(var(--my, 0) * -2px), 0) translateY(${innerScrollY * 0.1}px)` }}
+              style={{ transform: `translate3d(calc(var(--mx, 0) * -2px), calc(var(--my, 0) * -2px), 0) translateY($calc(var(--isy) * 0.1))` }}
             >
               <div className="absolute top-[10%] left-[15%] -rotate-12 scale-75"><MarioPipe /></div>
               <div className="absolute top-[35%] right-[25%] rotate-[25deg] scale-50"><MarioCoin /></div>
@@ -593,7 +617,7 @@ export default function Hero() {
             {/* Layer 2 (Middle Depth) */}
             <div 
               className="absolute inset-0 opacity-50 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate3d(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -4px), 0) translateY(${innerScrollY * 0.25}px)` }}
+              style={{ transform: `translate3d(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -4px), 0) translateY($calc(var(--isy) * 0.25))` }}
             >
               <div className="absolute top-[5%] left-[30%] rotate-6 scale-90"><MarioCoin /></div>
               <div className="absolute top-[45%] right-[8%] -rotate-[15deg] scale-100"><MarioPipe /></div>
@@ -604,7 +628,7 @@ export default function Hero() {
             {/* Layer 3 (Closest Background, Fastest) */}
             <div 
               className="absolute inset-0 opacity-80 transition-transform duration-[400ms] md:duration-200 ease-out"
-              style={{ transform: `translate3d(calc(var(--mx, 0) * -7px), calc(var(--my, 0) * -7px), 0) translateY(${innerScrollY * 0.45}px)` }}
+              style={{ transform: `translate3d(calc(var(--mx, 0) * -7px), calc(var(--my, 0) * -7px), 0) translateY($calc(var(--isy) * 0.45))` }}
             >
               <div className="absolute top-[15%] right-[15%] rotate-12 scale-110"><MarioQuestion /></div>
               <div className="absolute top-[28%] left-[5%] -rotate-12 scale-125"><MarioBrick /></div>
@@ -614,7 +638,7 @@ export default function Hero() {
           </div>
 
           <div className="relative z-20 w-full max-w-6xl mx-auto transition-transform duration-200 ease-out"
-            style={{ transform: `translate3d(calc(var(--mx, 0) * -20px), calc(var(--my, 0) * -20px), 0) translateY(${innerScrollY}px)` }}>
+            style={{ transform: `translate3d(calc(var(--mx, 0) * -20px), calc(var(--my, 0) * -20px), 0) translateY($var(--isy))` }}>
             
             <h2 className="font-display-xl text-headline-lg-mobile md:text-display-xl uppercase leading-none mb-2 text-center">
               HOW I <span className="bg-primary-container text-on-background px-4 py-1 inline-block -rotate-2 border-[4px] border-on-background shadow-[4px_4px_0_0_#1b1c15] md:shadow-[8px_8px_0_0_#1b1c15]">WORK</span>
@@ -642,7 +666,7 @@ export default function Hero() {
                   vectorEffect="non-scaling-stroke" 
                   pathLength="100"
                   strokeDasharray="100"
-                  strokeDashoffset={100 - roadmapProgress * 100}
+                  strokeDashoffset="var(--rp-pct)"
                   className="transition-all duration-75 drop-shadow-[0_0_8px_var(--color-cobalt)]"
                 />
               </svg>
@@ -654,7 +678,7 @@ export default function Hero() {
                 { title: "The Polish", icon: <PixelIcon art={starArt} color="#ffcc00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-primary-container text-on-background", copy: "We review the draft together. I tweak the details and fix that one tiny thing that only we will ever notice.", activeAt: 0.67, top: "50%", leftClasses: "left-[4%] md:left-1/2", rotate: "rotate-6" },
                 { title: "The Handoff", icon: <PixelIcon art={rocketArt} color="#ccff00" className="w-8 h-8 md:w-10 md:h-10" />, bg: "bg-on-background text-background", copy: "The final product is packaged up and ready to go. You get the deliverables, and I take a very well-deserved nap.", activeAt: 0.85, top: "73%", leftClasses: "left-[4%] md:left-1/4", rotate: "-rotate-6" }
               ].map((step, idx) => {
-                const isActive = roadmapProgress >= step.activeAt;
+                const isActive = activeStep > idx;
                 return (
                   <div key={idx} 
                     className={`absolute ${step.leftClasses} w-[92%] md:w-[45%] group z-10 transition-transform duration-500 ease-out ${isActive ? step.rotate : 'rotate-0'}`}
