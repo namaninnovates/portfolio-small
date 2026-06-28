@@ -10,7 +10,7 @@ export default function LenisProvider({ children }) {
       syncTouch: true,
       syncTouchLerp: 0.1,
       touchInertiaMultiplier: 35,
-      touchMultiplier: 1.5,
+      touchMultiplier: 2.5,
       wheelMultiplier: 1,
       infinite: false,
       autoResize: true,
