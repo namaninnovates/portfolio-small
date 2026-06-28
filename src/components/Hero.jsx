@@ -164,7 +164,7 @@ const rocketArt = [
 const FloatingLogo = ({ bg, color, text, icon, rotate, positionClasses, parallaxSpeed, sizeClass = "w-14 h-14 md:w-20 md:h-20" }) => (
   <div 
     className={`absolute ${positionClasses} z-10 transition-transform duration-[400ms] md:duration-200 ease-out`}
-    style={{ transform: `translate3d(calc(var(--mx, 0) * ${parallaxSpeed}px), calc(var(--my, 0) * ${parallaxSpeed}px), 0)` }}
+    style={{ transform: `translate3d(calc(var(--mx, 0) * ${parallaxSpeed}px), calc((var(--my, 0) * ${parallaxSpeed}px) + (var(--sy, 0) * ${parallaxSpeed * -1.5}px)), 0)` }}
   >
     <div className={`flex items-center justify-center border-4 border-on-background shadow-[4px_4px_0_0_#1b1c15] md:shadow-[6px_6px_0_0_#1b1c15] ${bg} ${color} ${sizeClass} ${rotate}`}>
       {text && <span className="font-sans font-bold tracking-tight text-3xl md:text-5xl leading-none">{text}</span>}
@@ -268,13 +268,14 @@ export default function Hero() {
   }, []);
 
   useLenis(({ scroll }) => {
-    const rectTop = -scroll;
-    let progress = 0;
+    if (!heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    const scrollTotal = rect.height - window.innerHeight;
+    const progress = -rect.top / (window.innerHeight); // roughly 0 to 4
     
-    if (rectTop <= 0) {
-      progress = Math.max(0, Math.min(5, -rectTop / viewportHeightRef.current));
-    }
-    
+    heroRef.current.style.setProperty('--sy', progress);
+
+    // e1 goes from 0 to 1 during the first viewport scroll (0 to 1 progress)
     const e1 = Math.max(0, Math.min(1, progress));
     const e2 = Math.max(0, Math.min(1, progress - 1.2));
     
