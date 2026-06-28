@@ -104,7 +104,10 @@ export default function InteractiveBackground() {
     };
 
     const handleOrientation = (e) => {
+      // Bail out on mobile — the cursor/lens are hidden anyway, no need to waste CPU
+      if (window.innerWidth < 768) return;
       if (e.gamma === null || e.beta === null) return;
+      
       let normX = Math.max(-1, Math.min(1, e.gamma / 45));
       let normY = Math.max(-1, Math.min(1, (e.beta - 45) / 45));
       

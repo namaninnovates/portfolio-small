@@ -238,6 +238,8 @@ export default function Hero() {
     let gyroRaf;
     let lastGyroTime = 0;
     const handleOrientation = (e) => {
+      // Disable gyro parallax on mobile to prevent severe scroll lag and battery drain
+      if (window.innerWidth < 768) return;
       if (e.gamma === null || e.beta === null) return;
       const now = performance.now();
       if (now - lastGyroTime < 33) return;
@@ -458,8 +460,8 @@ export default function Hero() {
             style={{ transform: `translate3d(calc(var(--mx, 0) * 80px), calc(var(--my, 0) * 80px), 0)` }}
           >
             <span className="absolute top-[5%] md:top-[15%] right-[5%] md:right-[15%] bg-cobalt text-on-primary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-6 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">FAST</span>
-            <span className="absolute bottom-[10%] md:bottom-[20%] left-[5%] md:left-[10%] bg-secondary-container text-on-secondary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase -rotate-12 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">KINETIC</span>
-            <span className="absolute top-[80%] md:top-[40%] left-[10%] md:left-[5%] bg-primary-container text-on-background border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-3 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">LOUD</span>
+            <span className="absolute bottom-[15%] md:bottom-[20%] left-[5%] md:left-[10%] bg-secondary-container text-on-secondary border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase -rotate-12 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">KINETIC</span>
+            <span className="absolute bottom-[2%] md:bottom-auto md:top-[40%] right-[5%] md:right-auto md:left-[5%] bg-primary-container text-on-background border-4 border-on-background px-4 md:px-6 py-1 md:py-2 font-headline-md text-headline-md uppercase rotate-3 neo-shadow drop-shadow-[8px_8px_0_#1b1c15]">LOUD</span>
           </div>
 
           <div 
@@ -619,7 +621,7 @@ export default function Hero() {
                   >
                     <div className={`border-4 border-on-background p-3 md:p-6 transition-all duration-500 ease-out ${isActive ? 'bg-background neo-shadow opacity-100 scale-100' : 'bg-surface-container-high opacity-50 grayscale scale-[0.6] md:scale-75 blur-[1px] -translate-y-8'}`}>
                       <div className="flex items-center gap-3 md:gap-4 mb-2 border-b-4 border-on-background pb-2">
-                        <span className={`flex-shrink-0 ${step.bg} border-4 border-on-background w-12 h-12 md:w-16 md:h-16 flex items-center justify-center neo-shadow transition-transform duration-500 ${isActive ? '-rotate-12 scale-110' : 'rotate-0 scale-100'}`}>
+                        <span className={`flex-shrink-0 w-12 h-12 md:w-16 md:h-16 flex items-center justify-center transition-transform duration-500 ${isActive ? '-rotate-12 scale-110' : 'rotate-0 scale-100'}`}>
                           {step.icon}
                         </span>
                         <h3 className="font-headline-md text-[16px] md:text-[26px] uppercase leading-tight">{step.title}</h3>
