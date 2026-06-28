@@ -148,6 +148,8 @@ const DinoPlanet = () => {
 };
 
 export default function Footer() {
+  const [openModal, setOpenModal] = useState(null);
+
   return (
     <footer className="w-full mt-stack-overlap border-t-8 border-on-background shadow-[8px_8px_0px_0px_#000000] bg-secondary text-on-secondary relative z-30 overflow-hidden">
       <DinoPlanet />
@@ -194,11 +196,67 @@ export default function Footer() {
               </svg>
             </a>
           </div>
-          <div className="font-label-mono text-label-mono bg-on-background text-background px-4 py-2 border-2 border-transparent">
-            © 2026 NAMAN GUPTA
+          <div className="flex flex-col items-center md:items-end gap-2">
+            <div className="font-label-mono text-label-mono bg-on-background text-background px-4 py-2 border-2 border-transparent">
+              © 2026 NAMAN GUPTA
+            </div>
+            <div className="flex gap-4 mt-2 font-label-mono text-[10px] md:text-xs text-on-secondary/70">
+              <button onClick={() => setOpenModal('terms')} className="hover:text-on-secondary hover:underline cursor-pointer">Terms & Policy</button>
+              <button onClick={() => setOpenModal('disclaimer')} className="hover:text-on-secondary hover:underline cursor-pointer">Disclaimer</button>
+              <button onClick={() => setOpenModal('license')} className="hover:text-on-secondary hover:underline cursor-pointer">License</button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Legal Modal */}
+      {openModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm cursor-default" onClick={() => setOpenModal(null)}>
+          <div className="bg-secondary text-on-secondary border-4 border-on-background p-8 max-w-lg w-full shadow-[8px_8px_0px_0px_#000000] relative animate-in fade-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setOpenModal(null)} className="absolute top-2 right-4 font-bold text-2xl hover:text-primary-container cursor-pointer">&times;</button>
+            <h3 className="font-display-md text-headline-md uppercase mb-4 drop-shadow-[2px_2px_0_#1b1c15]">
+              {openModal === 'terms' && 'Terms & Policy'}
+              {openModal === 'disclaimer' && 'Disclaimer'}
+              {openModal === 'license' && 'License'}
+            </h3>
+            <div className="font-body-md text-body-md space-y-4">
+              {openModal === 'terms' && (
+                <>
+                  <p>Welcome to my portfolio. By accessing this website, you agree to be bound by these terms and conditions of use.</p>
+                  <p>All content, projects, and designs showcased on this platform are presented by me, Naman Gupta. I maintain ownership of my work and accept complete responsibility for the materials presented herein.</p>
+                  <p>Any unauthorized reproduction, distribution, or commercial exploitation of my work without explicit, prior written consent is strictly prohibited and constitutes a violation of intellectual property laws.</p>
+                </>
+              )}
+              {openModal === 'disclaimer' && (
+                <>
+                  <p>The information contained on this website is for general informational and demonstrative purposes only.</p>
+                  <p>While every effort is made to keep the content accurate and up to date, I make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, or suitability with respect to the website or the information and related graphics contained within.</p>
+                  <p>Any reliance you place on such material is therefore strictly at your own risk. Any resemblance to other existing products, projects, or entities is purely coincidental.</p>
+                </>
+              )}
+              {openModal === 'license' && (
+                <div className="space-y-5">
+                  <div className="p-4 border-2 border-on-background/20 bg-background/50">
+                    <p className="font-bold text-lg leading-none mb-1">Copyright &copy; 2026 Naman Gupta.</p>
+                    <p className="text-sm uppercase tracking-widest text-on-secondary/70">All Rights Reserved.</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-bold border-b-2 border-on-background/20 pb-2 mb-2">1. Open Source Framework (MIT License)</h4>
+                    <p className="text-sm">The underlying React structural framework of this website is provided under the <strong>MIT License</strong>. You are free to view, learn from, and adapt the structural codebase for educational purposes.</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-bold border-b-2 border-on-background/20 pb-2 mb-2">2. Proprietary Assets (All Rights Reserved)</h4>
+                    <p className="text-sm">All custom UI/UX designs, personal branding, project details, typography, interactive elements, and visual content are strictly <strong>All Rights Reserved</strong>. They are NOT covered by the MIT license.</p>
+                    <p className="text-sm mt-3 font-bold text-primary-container">Using, duplicating, or repurposing my personal creative work, designs, or imagery for your own projects without authorization is illegal, unfair, and strictly prohibited.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }
