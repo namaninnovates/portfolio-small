@@ -176,20 +176,31 @@ export default function Navbar() {
     let pendingCoinTabIdx = -1;
     let wasNegativeVy = false; // tracks if we were still going up
 
-    function getTabXs() {
-      if (!navRef.current) return [];
+    let cachedNavW = 900;
+    let cachedTabXs = [];
+    let cachedPipeXs = [];
+
+    function updateMeasurements() {
+      if (!navRef.current) return;
+      cachedNavW = navRef.current.offsetWidth || 900;
+      cachedPipeXs = PIPES.map(p => p.relX * cachedNavW);
+      
       const nr = navRef.current.getBoundingClientRect();
-      return linkRefs.current.map(el => {
-        if (!el || el.offsetParent === null) return -999; // Check if hidden
+      cachedTabXs = linkRefs.current.map(el => {
+        if (!el || el.offsetParent === null) return -999;
         const r = el.getBoundingClientRect();
         return r.left - nr.left + r.width / 2;
       });
     }
 
+    // Initial measurement
+    updateMeasurements();
+    window.addEventListener('resize', updateMeasurements);
+
     function loop() {
-      const navW   = navRef.current?.offsetWidth ?? 900;
-      const pipeXs = PIPES.map(p => p.relX * navW);
-      const tabXs  = getTabXs();
+      const navW   = cachedNavW;
+      const pipeXs = cachedPipeXs;
+      const tabXs  = cachedTabXs;
 
       // Move Mario
       s.x += s.speed * s.dir;
@@ -276,7 +287,10 @@ export default function Navbar() {
     }
 
     rafRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('resize', updateMeasurements);
+    };
   }, []);
 
   const NAV_LINKS = [

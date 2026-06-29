@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 
 const testimonials = [
   {
@@ -104,7 +105,7 @@ export default function Testimonials() {
               {/* Right Side: Fiverr */}
               <div className="flex flex-col items-start justify-center pl-3 md:pl-6 pr-1 md:pr-2">
                 <span className="font-label-mono font-bold text-[7px] md:text-[10px] uppercase tracking-widest mb-1 md:mb-1.5">Available On</span>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Fiverr_Logo_09.2020.svg" alt="Fiverr" width={100} height={32} className="h-4 md:h-8 w-auto object-contain brightness-0" />
+                <Image src="https://upload.wikimedia.org/wikipedia/commons/1/18/Fiverr_Logo_09.2020.svg" alt="Fiverr" width={100} height={32} className="h-4 md:h-8 w-auto object-contain brightness-0" />
               </div>
             </div>
           </a>

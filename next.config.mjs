@@ -5,6 +5,14 @@ const nextConfig = {
       bodySizeLimit: '4mb',
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+      },
+    ],
+  },
 
   async headers() {
     return [
