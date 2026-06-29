@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useLenis } from 'lenis/react';
 
 export default function InteractiveBackground() {
@@ -8,7 +8,9 @@ export default function InteractiveBackground() {
   const lensRef = useRef(null);
   const glowRef = useRef(null);
   const cloudRefs = useRef([]);
-  
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   // Store values in refs to avoid re-renders
   const cursorPosRef = useRef({ x: -100, y: -100 });
   const isHoveringRef = useRef(false);
@@ -133,6 +135,8 @@ export default function InteractiveBackground() {
       if (pointerRaf) cancelAnimationFrame(pointerRaf);
     };
   }, [updateCursor]);
+
+  if (!mounted) return null;
 
   return (
     <>
