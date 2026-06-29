@@ -11,14 +11,24 @@ import { db } from '@/lib/db'
 import { works as worksSchema } from '@/db/schema'
 import { asc, desc } from 'drizzle-orm'
 
+import { unstable_cache } from 'next/cache';
+
 export const revalidate = 60
 
+const getWorks = unstable_cache(
+  async () => {
+    return await db
+      .select()
+      .from(worksSchema)
+      .orderBy(asc(worksSchema.order), desc(worksSchema.createdAt))
+      .limit(12)
+  },
+  ['home-works-query'],
+  { revalidate: 60 }
+);
+
 export default async function Home() {
-  const works = await db
-    .select()
-    .from(worksSchema)
-    .orderBy(asc(worksSchema.order), desc(worksSchema.createdAt))
-    .limit(12)
+  const works = await getWorks();
 
   return (
     <>
