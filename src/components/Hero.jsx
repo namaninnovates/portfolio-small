@@ -210,11 +210,7 @@ export default function Hero() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (heroRef.current) {
-        viewportHeightRef.current = heroRef.current.clientHeight / 5;
-      } else {
-        viewportHeightRef.current = window.innerHeight;
-      }
+      viewportHeightRef.current = window.innerHeight;
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -348,7 +344,7 @@ export default function Hero() {
         {/* --- BLOCK 1: INTRO --- */}
         <div 
           ref={b1Ref}
-          className="absolute inset-0 flex flex-col justify-center px-margin-mobile md:px-margin-desktop will-change-[transform,opacity]"
+          className="absolute inset-0 flex flex-col justify-center px-margin-mobile md:px-margin-desktop"
         >
           <div 
             className="absolute top-20 right-10 md:right-32 w-32 h-32 bg-primary-container border-4 border-on-background rounded-full mix-blend-multiply opacity-50 blur-3xl animate-pulse"
@@ -421,7 +417,7 @@ export default function Hero() {
         {/* --- BLOCK 2: IMPACT STATEMENT --- */}
         <div 
           ref={b2Ref}
-          className="absolute inset-0 flex flex-col justify-center items-center text-center px-margin-mobile md:px-margin-desktop will-change-[transform,opacity] opacity-0"
+          className="absolute inset-0 flex flex-col justify-center items-center text-center px-margin-mobile md:px-margin-desktop opacity-0"
         >
           <div 
             className="absolute top-1/4 left-1/4 w-64 h-64 bg-cobalt border-4 border-on-background rounded-full mix-blend-multiply opacity-30 blur-3xl animate-pulse"
@@ -554,7 +550,7 @@ export default function Hero() {
         {/* --- BLOCK 3: ROADMAP / FLOW --- */}
         <div 
           ref={b3Ref}
-          className="absolute inset-0 flex flex-col justify-start items-center text-left pt-24 md:pt-32 px-margin-mobile md:px-margin-desktop will-change-[transform,opacity] opacity-0"
+          className="absolute inset-0 flex flex-col justify-start items-center text-left pt-24 md:pt-32 px-margin-mobile md:px-margin-desktop opacity-0"
         >
           <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
             <div ref={m1Ref} className="absolute inset-0 opacity-30">
