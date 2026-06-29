@@ -104,7 +104,7 @@ export default function ContactPage() {
                     id="name" 
                     name="name"
                     required
-                    className="bg-background text-on-background border-4 border-transparent p-4 font-body-lg outline-none transition-all duration-200 focus:border-primary-container focus:bg-primary-container/10 focus:-translate-y-1 focus:shadow-[4px_4px_0_0_var(--color-primary-container)]"
+                    className="bg-background text-on-background border-4 border-transparent p-4 font-body-lg outline-none transition-all duration-200 focus:border-primary-container focus:-translate-y-1 focus:shadow-[4px_4px_0_0_var(--color-primary-container)]"
                     placeholder="John Doe"
                   />
                   <div className="absolute right-4 top-12 opacity-0 group-focus-within:opacity-100 transition-opacity">
@@ -120,7 +120,7 @@ export default function ContactPage() {
                     id="email" 
                     name="email"
                     required
-                    className="bg-background text-on-background border-4 border-transparent p-4 font-body-lg outline-none transition-all duration-200 focus:border-cobalt focus:bg-cobalt/10 focus:-translate-y-1 focus:shadow-[4px_4px_0_0_var(--color-cobalt)]"
+                    className="bg-background text-on-background border-4 border-transparent p-4 font-body-lg outline-none transition-all duration-200 focus:border-cobalt focus:-translate-y-1 focus:shadow-[4px_4px_0_0_var(--color-cobalt)]"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -133,7 +133,7 @@ export default function ContactPage() {
                     name="message"
                     required
                     rows={5}
-                    className="bg-background text-on-background border-4 border-transparent p-4 font-body-lg outline-none transition-all duration-200 focus:border-secondary-container focus:bg-secondary-container/10 focus:-translate-y-1 focus:shadow-[4px_4px_0_0_var(--color-secondary-container)] resize-y"
+                    className="bg-background text-on-background border-4 border-transparent p-4 font-body-lg outline-none transition-all duration-200 focus:border-secondary-container focus:-translate-y-1 focus:shadow-[4px_4px_0_0_var(--color-secondary-container)] resize-y"
                     placeholder="Tell me about the project..."
                   />
                 </div>

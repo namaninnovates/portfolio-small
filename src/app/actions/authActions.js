@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 
 import { SignJWT } from 'jose'
 import bcrypt from 'bcryptjs'
-import { jwtKey } from '@/lib/auth'
+import { getJwtKey } from '@/lib/auth'
 
 export async function loginAction(prevState, formData) {
   const password = formData.get('password')
@@ -23,23 +23,28 @@ export async function loginAction(prevState, formData) {
   const isValid = bcrypt.compareSync(password, adminPasswordHash)
 
   if (isValid) {
-    // Generate secure signed JWT
-    const token = await new SignJWT({ authenticated: true })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('24h')
-      .sign(jwtKey)
+    try {
+      // Generate secure signed JWT
+      const token = await new SignJWT({ authenticated: true })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('24h')
+        .sign(getJwtKey())
 
-    const cookieStore = await cookies()
-    cookieStore.set('admin_session', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 24, // 24 hours
-      path: '/',
-    })
-    
-    redirect('/admin')
+      const cookieStore = await cookies()
+      cookieStore.set('admin_session', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24, // 24 hours
+        path: '/',
+      })
+      
+      redirect('/admin')
+    } catch (error) {
+      console.error('Login error:', error)
+      return { error: 'Server configuration error. Check server logs.' }
+    }
   }
 
   return { error: 'Invalid password' }

@@ -4,13 +4,15 @@ import { jwtVerify } from 'jose'
 
 // Edge middleware cannot import from lib/auth.js (Node.js module), so we
 // duplicate the key derivation here. Both use the same JWT_SECRET env var.
-const JWT_SECRET = process.env.JWT_SECRET
-if (!JWT_SECRET) {
-  throw new Error(
-    'JWT_SECRET environment variable is required. Generate one with: openssl rand -base64 64'
-  )
+const getJwtKey = () => {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    throw new Error(
+      'JWT_SECRET environment variable is required. Generate one with: openssl rand -base64 64'
+    )
+  }
+  return new TextEncoder().encode(secret)
 }
-const key = new TextEncoder().encode(JWT_SECRET)
 
 export async function middleware(request) {
   // Check if trying to access admin routes
@@ -29,6 +31,7 @@ export async function middleware(request) {
 
     // Cryptographically verify the session token
     try {
+      const key = getJwtKey()
       await jwtVerify(authCookie.value, key)
       return NextResponse.next()
     } catch (error) {

@@ -1,15 +1,16 @@
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 
-// Crash at module load if JWT_SECRET is missing — never fall back to a known value
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error(
-    'JWT_SECRET environment variable is required. Generate one with: openssl rand -base64 64'
-  );
-}
-
-export const jwtKey = new TextEncoder().encode(JWT_SECRET);
+// Get the key dynamically to prevent crashing on module load
+export const getJwtKey = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error(
+      'JWT_SECRET environment variable is required. Generate one with: openssl rand -base64 64'
+    );
+  }
+  return new TextEncoder().encode(secret);
+};
 
 /**
  * Verifies the admin session cookie contains a valid, non-expired JWT.
@@ -25,8 +26,9 @@ export async function verifyAdmin() {
   }
 
   try {
-    await jwtVerify(token.value, jwtKey);
-  } catch {
+    const key = getJwtKey();
+    await jwtVerify(token.value, key);
+  } catch (error) {
     throw new Error('Unauthorized: Invalid or expired session');
   }
 }
