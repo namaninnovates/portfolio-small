@@ -23,6 +23,7 @@ export async function loginAction(prevState, formData) {
   const isValid = bcrypt.compareSync(password, adminPasswordHash)
 
   if (isValid) {
+    let loginSuccess = false;
     try {
       // Generate secure signed JWT
       const token = await new SignJWT({ authenticated: true })
@@ -40,10 +41,14 @@ export async function loginAction(prevState, formData) {
         path: '/',
       })
       
-      redirect('/admin')
+      loginSuccess = true;
     } catch (error) {
       console.error('Login error:', error)
       return { error: 'Server configuration error. Check server logs.' }
+    }
+
+    if (loginSuccess) {
+      redirect('/admin')
     }
   }
 

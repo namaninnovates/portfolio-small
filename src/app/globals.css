@@ -111,6 +111,16 @@
   --text-headline-md--font-weight: 400;
 }
 
+:root {
+  --hero-text-shadow: 4px 4px 0 #1b1c15;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --hero-text-shadow: 8px 8px 0 #1b1c15;
+  }
+}
+
 @layer utilities {
   .material-symbols-outlined {
     font-variation-settings:

@@ -381,7 +381,7 @@ export default function Hero() {
             style={{ transform: `translate3d(calc(var(--mx, 0) * -30px), calc(var(--my, 0) * -30px), 0)` }}
           >
             <h1 className="font-display-xl text-display-xl-mobile md:text-display-xl uppercase leading-[1.1] md:leading-none mb-4 md:mb-8 tracking-tighter">
-              <span className="block md:-ml-2 hover:ml-2 transition-all duration-300"><span className="text-cobalt">CREATIVE</span> <span className="text-primary-container drop-shadow-[4px_4px_0_#1b1c15] md:drop-shadow-[8px_8px_0_#1b1c15] stroke-on-background" style={{ WebkitTextStroke: '2px #1b1c15' }}>BY DESIGN,</span></span>
+              <span className="block md:-ml-2 hover:ml-2 transition-all duration-300"><span className="text-cobalt">CREATIVE</span> <span className="text-primary-container stroke-on-background" style={{ WebkitTextStroke: '2px #1b1c15', textShadow: 'var(--hero-text-shadow, 4px 4px 0 #1b1c15)' }}>BY DESIGN,</span></span>
               <span className="block md:ml-4 hover:-ml-2 transition-all duration-300">EDITOR <span className="bg-on-background text-background px-2 md:px-4 inline-block -rotate-2">BY CRAFT,</span></span>
               <span className="block text-secondary-container">DEV BY CHOICE</span>
             </h1>

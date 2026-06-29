@@ -51,8 +51,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`light ${anton.variable} ${hankenGrotesk.variable} ${spaceMono.variable}`} style={{ overflowX: 'clip' }}>
       <head>
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-G69D0FR7FL" strategy="afterInteractive" />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-G69D0FR7FL" strategy="lazyOnload" />
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -61,8 +61,7 @@ export default function RootLayout({ children }) {
             gtag('config', 'G-G69D0FR7FL');
           `}
         </Script>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
       </head>
       <body className="text-on-background font-body-md w-full selection:bg-primary-container selection:text-on-background cursor-none" style={{ overflowX: 'clip' }}>
         {/* Load Material Symbols asynchronously — single non-blocking load */}
