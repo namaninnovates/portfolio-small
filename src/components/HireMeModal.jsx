@@ -67,6 +67,8 @@ export default function HireMeModal({ isOpen, onClose }) {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Honeypot anti-spam field — invisible to humans */}
+              <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} />
               {status === 'error' && (
                 <div className="bg-error text-on-error border-4 border-black p-4 font-body-md text-body-md">
                   {message}

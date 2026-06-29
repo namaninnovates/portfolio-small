@@ -77,6 +77,9 @@ export default function InteractiveBackground() {
   });
 
   useEffect(() => {
+    // Signal to CSS that the custom cursor is active — only then hide the native cursor
+    document.documentElement.classList.add('custom-cursor-active');
+
     let pointerRaf;
     
     const handlePointerMove = (e) => {
@@ -124,6 +127,7 @@ export default function InteractiveBackground() {
     window.addEventListener("deviceorientation", handleOrientation);
     
     return () => {
+      document.documentElement.classList.remove('custom-cursor-active');
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("deviceorientation", handleOrientation);
       if (pointerRaf) cancelAnimationFrame(pointerRaf);

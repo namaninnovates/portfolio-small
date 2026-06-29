@@ -11,7 +11,7 @@ import { db } from '@/lib/db'
 import { works as worksSchema } from '@/db/schema'
 import { asc, desc } from 'drizzle-orm'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
 
 export default async function Home() {
   const works = await db

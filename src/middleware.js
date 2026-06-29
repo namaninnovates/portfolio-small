@@ -2,7 +2,14 @@ import { NextResponse } from 'next/server'
 
 import { jwtVerify } from 'jose'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-development-only'
+// Edge middleware cannot import from lib/auth.js (Node.js module), so we
+// duplicate the key derivation here. Both use the same JWT_SECRET env var.
+const JWT_SECRET = process.env.JWT_SECRET
+if (!JWT_SECRET) {
+  throw new Error(
+    'JWT_SECRET environment variable is required. Generate one with: openssl rand -base64 64'
+  )
+}
 const key = new TextEncoder().encode(JWT_SECRET)
 
 export async function middleware(request) {

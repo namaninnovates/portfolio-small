@@ -169,8 +169,22 @@
     background-size: 20px 20px;
     background-image: radial-gradient(#1b1c15 1px, transparent 1px);
   }
+
+  /* Hide Safari/Chrome default video play button on blocked autoplays */
+  video::-webkit-media-controls-start-playback-button,
+  video::-webkit-media-controls-play-button,
+  video::-webkit-media-controls {
+    display: none !important;
+    -webkit-appearance: none;
+  }
 }
-html, body, *, *::before, *::after {
+/* Custom cursor — only hide native cursor when the JS-based custom cursor is active.
+   InteractiveBackground.jsx adds .custom-cursor-active to <html> once mounted. */
+html.custom-cursor-active, 
+html.custom-cursor-active body, 
+html.custom-cursor-active *, 
+html.custom-cursor-active *::before, 
+html.custom-cursor-active *::after {
   cursor: none !important;
 }
 

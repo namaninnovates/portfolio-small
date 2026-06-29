@@ -43,4 +43,6 @@ next-env.d.ts
 /data_backup.json
 .neon
 package-lock.json
+dev.db
+migration_state.json
 

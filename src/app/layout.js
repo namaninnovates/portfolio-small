@@ -3,13 +3,19 @@ import "./globals.css";
 export const metadata = {
   title: "Naman Gupta's Portfolio",
   description: "Creative by design, editor by craft, dev by choice.",
+  metadataBase: new URL("https://iamnamang.in"),
   openGraph: {
     title: "Naman Gupta's Portfolio",
     description: "Creative by design, editor by craft, dev by choice.",
     url: "https://iamnamang.in",
     siteName: "Naman Gupta's Portfolio",
     type: "website",
-  }
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Naman Gupta's Portfolio",
+    description: "Creative by design, editor by craft, dev by choice.",
+  },
 };
 
 import InteractiveBackground from "@/components/InteractiveBackground";
@@ -57,14 +63,9 @@ export default function RootLayout({ children }) {
         </Script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
-        {/* Asynchronous load for Material Symbols icon font to prevent render blocking */}
-        <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
-        <noscript>
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
-        </noscript>
       </head>
       <body className="text-on-background font-body-md w-full selection:bg-primary-container selection:text-on-background cursor-none" style={{ overflowX: 'clip' }}>
+        {/* Load Material Symbols asynchronously — single non-blocking load */}
         <Script id="material-icons-css" strategy="afterInteractive">
           {`
             const link = document.createElement('link');
@@ -73,6 +74,9 @@ export default function RootLayout({ children }) {
             document.head.appendChild(link);
           `}
         </Script>
+        <noscript>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+        </noscript>
         <LenisProvider>
           <InteractiveBackground />
           {children}

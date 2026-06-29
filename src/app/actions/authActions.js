@@ -5,9 +5,7 @@ import { redirect } from 'next/navigation'
 
 import { SignJWT } from 'jose'
 import bcrypt from 'bcryptjs'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-for-development-only'
-const key = new TextEncoder().encode(JWT_SECRET)
+import { jwtKey } from '@/lib/auth'
 
 export async function loginAction(prevState, formData) {
   const password = formData.get('password')
@@ -29,14 +27,15 @@ export async function loginAction(prevState, formData) {
     const token = await new SignJWT({ authenticated: true })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('7d')
-      .sign(key)
+      .setExpirationTime('24h')
+      .sign(jwtKey)
 
     const cookieStore = await cookies()
     cookieStore.set('admin_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24, // 24 hours
       path: '/',
     })
     

@@ -5,7 +5,16 @@ import { db } from '@/lib/db'
 import { works as worksSchema } from '@/db/schema'
 import { asc, desc } from 'drizzle-orm'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 60
+
+export const metadata = {
+  title: 'Works | IAMNAMANG',
+  description: 'Explore my portfolio — web development, video editing, and UI/UX design projects.',
+  openGraph: {
+    title: 'Works | IAMNAMANG',
+    description: 'Explore my portfolio — web development, video editing, and UI/UX design projects.',
+  },
+}
 
 export default async function WorksPage() {
   const works = await db

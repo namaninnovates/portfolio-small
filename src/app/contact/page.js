@@ -3,19 +3,37 @@
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { useState } from 'react'
+import { createEnquiry } from '@/app/actions/enquiryActions'
 
 export default function ContactPage() {
-  const [formState, setFormState] = useState('idle'); // idle, loading, success
+  const [formState, setFormState] = useState('idle'); // idle, loading, success, error
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setFormState('loading');
-    // Simulate network request
-    setTimeout(() => {
+    setErrorMessage('');
+
+    const formData = new FormData(e.target);
+    // Map contact form fields to enquiry format
+    formData.set('projectType', 'General Enquiry');
+    formData.set('budget', 'To be discussed');
+    // The textarea is named 'message' in this form but 'description' in the action
+    const message = formData.get('message');
+    formData.set('description', message);
+
+    const result = await createEnquiry(formData);
+
+    if (result.error) {
+      setFormState('error');
+      setErrorMessage(result.error);
+    } else {
       setFormState('success');
-      // Reset after 3 seconds
-      setTimeout(() => setFormState('idle'), 3000);
-    }, 1500);
+      setTimeout(() => {
+        setFormState('idle');
+        e.target.reset();
+      }, 3000);
+    }
   };
 
   return (
@@ -67,12 +85,24 @@ export default function ContactPage() {
 
               {/* Form Body */}
               <form onSubmit={handleSubmit} className="px-4 md:px-8 pb-8 space-y-8">
+                {/* Honeypot anti-spam field — invisible to humans */}
+                <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} />
+
+                {/* Error display */}
+                {formState === 'error' && (
+                  <div className="bg-secondary text-on-secondary border-4 border-background p-4 font-body-md flex items-center gap-2">
+                    <span className="material-symbols-outlined">error</span>
+                    {errorMessage}
+                  </div>
+                )}
+
                 {/* Name */}
                 <div className="flex flex-col gap-2 relative group">
                   <label htmlFor="name" className="font-headline-md text-xl uppercase tracking-wide">YOUR_NAME</label>
                   <input 
                     type="text" 
                     id="name" 
+                    name="name"
                     required
                     className="bg-background text-on-background border-4 border-transparent p-4 font-body-lg outline-none transition-all duration-200 focus:border-primary-container focus:bg-primary-container/10 focus:-translate-y-1 focus:shadow-[4px_4px_0_0_var(--color-primary-container)]"
                     placeholder="John Doe"
@@ -88,6 +118,7 @@ export default function ContactPage() {
                   <input 
                     type="email" 
                     id="email" 
+                    name="email"
                     required
                     className="bg-background text-on-background border-4 border-transparent p-4 font-body-lg outline-none transition-all duration-200 focus:border-cobalt focus:bg-cobalt/10 focus:-translate-y-1 focus:shadow-[4px_4px_0_0_var(--color-cobalt)]"
                     placeholder="john@example.com"
@@ -99,6 +130,7 @@ export default function ContactPage() {
                   <label htmlFor="message" className="font-headline-md text-xl uppercase tracking-wide">THE_PITCH</label>
                   <textarea 
                     id="message" 
+                    name="message"
                     required
                     rows={5}
                     className="bg-background text-on-background border-4 border-transparent p-4 font-body-lg outline-none transition-all duration-200 focus:border-secondary-container focus:bg-secondary-container/10 focus:-translate-y-1 focus:shadow-[4px_4px_0_0_var(--color-secondary-container)] resize-y"
@@ -114,12 +146,14 @@ export default function ContactPage() {
                     className={`w-full font-display-xl text-3xl md:text-5xl uppercase p-6 border-4 border-background transition-all duration-200 flex items-center justify-center gap-4 ${
                       formState === 'idle' ? 'bg-primary-container text-on-background hover:bg-background hover:text-on-background hover:-translate-y-2 hover:shadow-[8px_8px_0_0_var(--color-background)] cursor-pointer' : 
                       formState === 'loading' ? 'bg-cobalt text-white animate-pulse cursor-wait' : 
+                      formState === 'error' ? 'bg-secondary text-on-secondary cursor-pointer' :
                       'bg-secondary text-on-secondary cursor-not-allowed'
                     }`}
                   >
                     {formState === 'idle' && 'SEND_TRANSMISSION'}
                     {formState === 'loading' && 'UPLOADING...'}
                     {formState === 'success' && 'RECEIVED!'}
+                    {formState === 'error' && 'RETRY'}
                     
                     {formState === 'idle' && <span className="material-symbols-outlined text-4xl hidden md:block">send</span>}
                     {formState === 'success' && <span className="material-symbols-outlined text-4xl">check_circle</span>}

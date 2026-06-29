@@ -103,15 +103,6 @@ export default function Work({ works = [], title = "SELECTED", showViewAll = fal
 
   return (
     <section className={`px-margin-mobile md:px-margin-desktop pt-16 pb-48 relative z-20 border-t-4 border-on-background ${variant === 'dark' ? 'bg-on-background bg-grid-pattern-primary' : 'bg-surface-container-low'}`} id="work">
-      {/* CSS to hide Safari/Chrome default large play button on blocked autoplays */}
-      <style dangerouslySetInnerHTML={{__html: `
-        video::-webkit-media-controls-start-playback-button,
-        video::-webkit-media-controls-play-button,
-        video::-webkit-media-controls {
-          display: none !important;
-          -webkit-appearance: none;
-        }
-      `}} />
       <div className={`flex items-end justify-between mb-16 border-b-8 pb-4 relative ${variant === 'dark' ? 'border-background' : 'border-on-background'}`}>
         <h2 className={`font-display-xl text-headline-lg-mobile md:text-headline-lg uppercase flex items-center gap-4 ${variant === 'dark' ? 'text-background' : 'text-on-background'}`}>{title} <span className={`bg-primary-container text-on-background px-2 border-4 -rotate-2 inline-block ${variant === 'dark' ? 'border-background' : 'border-on-background'}`}>WORK</span><span className="material-symbols-outlined text-cobalt text-5xl rotate-90 hidden md:block">south</span></h2>
         <div className={`hidden md:block absolute -right-10 -bottom-10 w-24 h-24 rounded-full border-4 flex items-center justify-center ${variant === 'dark' ? 'bg-primary-container text-on-background border-background' : 'bg-dots border-on-background'}`}><span className="material-symbols-outlined text-4xl animate-bounce">arrow_downward</span></div>
