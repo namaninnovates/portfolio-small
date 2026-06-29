@@ -18,7 +18,8 @@ export const metadata = {
   },
 };
 
-import InteractiveBackground from "@/components/InteractiveBackground";
+import dynamic from "next/dynamic";
+const InteractiveBackground = dynamic(() => import("@/components/InteractiveBackground"), { ssr: false });
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
