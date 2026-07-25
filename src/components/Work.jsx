@@ -13,30 +13,45 @@ const LazyVideo = ({ src, trimStart, trimEnd, transform, className }) => {
     el.muted = true;
 
     if (typeof window !== 'undefined' && 'IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
+      // 1. Playback Observer: Only decodes/plays when actually visible (saves GPU on mobile)
+      const playObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              // Add a small delay to prevent play/pause thrashing while scrolling fast
               setTimeout(() => {
-                if (videoRef.current && !videoRef.current.paused === false) {
-                    const playPromise = el.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(() => {});
-                    }
+                if (videoRef.current && videoRef.current.paused) {
+                    videoRef.current.play().catch(() => {});
                 }
               }, 50);
             } else {
-              el.pause();
+              if (videoRef.current && !videoRef.current.paused) {
+                  videoRef.current.pause();
+              }
             }
           });
         },
-        { rootMargin: '600px' }
+        { rootMargin: '100px' } // Play just before it enters screen
       );
-      observer.observe(el);
+      playObserver.observe(el);
+
+      // 2. Preload Observer: Fetches video data over network well before visible (prevents blank screens)
+      const preloadObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              if (el.preload !== 'auto') {
+                el.preload = 'auto';
+              }
+            }
+          });
+        },
+        { rootMargin: '1500px' } // Fetch data ~1.5 to 2 screens away
+      );
+      preloadObserver.observe(el);
 
       return () => {
-        observer.disconnect();
+        playObserver.disconnect();
+        preloadObserver.disconnect();
       };
     } else {
       el.play().catch(()=>{});
