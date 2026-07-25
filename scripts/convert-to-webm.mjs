@@ -28,6 +28,8 @@ for (const line of envContent.split('\n')) {
   if (eqIdx === -1) continue;
   const key = trimmed.slice(0, eqIdx).trim();
   const val = trimmed.slice(eqIdx + 1).trim().replace(/^"(.*)"$/, '$1');
+  // Don't override DATABASE_URL if it was passed from outside (prod DB)
+  if (key === 'DATABASE_URL' && process.env.DATABASE_URL) continue;
   process.env[key] ??= val;
 }
 
@@ -37,6 +39,7 @@ const { neon } = await import('@neondatabase/serverless');
 
 // --- Config ---
 const DRY_RUN = process.argv.includes('--dry-run');
+const REMAINING = process.argv.includes('--remaining'); // convert non-webm only
 const SINGLE_ID = (() => {
   const idx = process.argv.indexOf('--id');
   return idx !== -1 ? process.argv[idx + 1] : null;
@@ -134,12 +137,16 @@ async function cleanUp(...files) {
 async function main() {
   console.log('\n🎬 WebM Conversion Script');
   console.log('═══════════════════════════════════════');
+  console.log(`🔗 DB: ${process.env.DATABASE_URL.slice(0, 45)}...`);
   if (DRY_RUN) console.log('⚠️  DRY RUN — no files will be changed\n');
 
   // Fetch videos from DB
   let rows;
   if (SINGLE_ID) {
     rows = await sql`SELECT id, title, "imageUrl", "mediaType" FROM "Work" WHERE id = ${SINGLE_ID}`;
+  } else if (REMAINING) {
+    // Only grab videos NOT yet converted to webm
+    rows = await sql`SELECT id, title, "imageUrl", "mediaType" FROM "Work" WHERE "mediaType" = 'video' AND "imageUrl" NOT LIKE '%.webm%' ORDER BY "order" ASC`;
   } else {
     rows = await sql`SELECT id, title, "imageUrl", "mediaType" FROM "Work" WHERE "mediaType" = 'video' ORDER BY "order" ASC`;
   }
