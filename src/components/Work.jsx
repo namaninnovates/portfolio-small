@@ -31,7 +31,7 @@ const LazyVideo = ({ src, trimStart, trimEnd, transform, className }) => {
             }
           });
         },
-        { rootMargin: '100px' }
+        { rootMargin: '600px' }
       );
       observer.observe(el);
 
