@@ -17,10 +17,6 @@ const LazyVideo = ({ src, trimStart, trimEnd, transform, className }) => {
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              if (!el.getAttribute('src')) {
-                el.setAttribute('src', src);
-                el.load();
-              }
               // Add a small delay to prevent play/pause thrashing while scrolling fast
               setTimeout(() => {
                 if (videoRef.current && !videoRef.current.paused === false) {
@@ -35,7 +31,7 @@ const LazyVideo = ({ src, trimStart, trimEnd, transform, className }) => {
             }
           });
         },
-        { rootMargin: '1200px' }
+        { rootMargin: '100px' }
       );
       observer.observe(el);
 
@@ -43,16 +39,14 @@ const LazyVideo = ({ src, trimStart, trimEnd, transform, className }) => {
         observer.disconnect();
       };
     } else {
-      if (!el.getAttribute('src')) {
-        el.setAttribute('src', src);
-      }
       el.play().catch(()=>{});
     }
-  }, [src]);
+  }, []);
 
   return (
     <video
       ref={videoRef}
+      src={src}
       className={className}
       style={{ transform }}
       muted
